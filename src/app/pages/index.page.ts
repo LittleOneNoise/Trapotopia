@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NgOptimizedImage} from "@angular/common";
 import {CardComponent} from "../components/card-presentation-double-image.component";
 import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
+import {CardReviewComponent} from "../components/card-review.component";
 
 @Component({
   selector: 'trapotopia-home',
@@ -104,13 +105,39 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
       </div>
     </section>
 
-    <!-- Ils nous font confiance -->
+    <!-- Ils nous détestent (et c'est bon signe) -->
     <section class="py-20 px-4 bg-[#121212]">
       <div class="max-w-6xl mx-auto">
 
         <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
           Ils nous détestent (et c'est bon signe)
         </h2>
+
+        <div class="flex flex-col md:flex-row gap-8 items-stretch justify-center">
+
+          <trapotopia-card-review
+            class="flex-1"
+            reviewerProfilPicture="https://renderer.dofusdb.fr/look/7b323036397c7c7c3135307d/full/1/300_300.png"
+            reviewerName="Comte Harebourg"
+            reviewerProfilPictureAlt="Comte Harebourg">
+            Tic... Tac... C'EST IMPOSSIBLE ! Mon système de π est conçu pour liquéfier les cerveaux normaux sous la
+            panique du calcul, mais cette guilde lit mes vecteurs comme on lit un menu à la taverne d'Astrub !
+            J'ai passé des siècles sur cette équation, et eux... ils l'ont résolue entre deux blagues sur mon chapeau.
+            Je vais vous démonter pour voir si vous cachez une calculette à la place du cœur. REVENEZ, IL ME FAUT PLUS DE TEMPS !
+          </trapotopia-card-review>
+
+          <trapotopia-card-review
+            class="flex-1"
+            reviewerProfilPicture="https://renderer.dofusdb.fr/look/7b363339367c7c7c38307d/full/1/300_300.png"
+            reviewerName="Oto Mustan"
+            reviewerProfilPictureAlt="Oto Mustan">
+            Ils ont éviscéré mes gardes avec une cruauté si pure que j'en ai presque eu la larme à l'œil.
+            C'est un massacre déshonorant, gratuit et d'une violence révoltante...
+            Exactement ce que j'aime.
+            Je les déteste pour cette défaite, mais leur sadisme est une œuvre d'art. Venez me voir, qu'on s'entre-tue à nouveau.
+          </trapotopia-card-review>
+
+        </div>
 
       </div>
     </section>
@@ -129,7 +156,8 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
   imports: [
     NgOptimizedImage,
     CardComponent,
-    ScrollRevealDirective
+    ScrollRevealDirective,
+    CardReviewComponent
   ]
 })
 export default class Home {

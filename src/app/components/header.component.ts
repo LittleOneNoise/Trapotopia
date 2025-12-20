@@ -12,10 +12,8 @@ import {RouterLink, RouterLinkActive} from "@angular/router";
         <div class="flex items-center justify-between h-20">
 
           <div class="flex items-center gap-3 min-w-0 flex-1">
-            <img class="h-10 w-10 shrink-0" ngSrc="/logo_trapotopia.png" alt="logo_trapotopia" height="913"
-                 width="913"
-                 priority/>
-            <span class="font-bold text-lg sm:text-xl tracking-wider text-gray-200 truncate block">TRAPOTOPIA</span>
+            <img class="h-14 w-14 shrink-0" ngSrc="/logo_trapotopia_header.png" alt="logo_trapotopia_header" height="1000"
+                 width="1000" priority/>
           </div>
 
           <div class="hidden md:block shrink-0">
