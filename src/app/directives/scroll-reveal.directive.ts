@@ -15,7 +15,7 @@ export class ScrollRevealDirective implements OnInit {
   private readonly platformId = inject(PLATFORM_ID);
 
   ngOnInit() {
-    // Sécurité pour AnalogJS (SSR)
+    // Sécurité pour SSR
     if (!isPlatformBrowser(this.platformId)) return;
 
     // 1. Appliquer les classes initiales

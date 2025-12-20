@@ -4,7 +4,7 @@ import {CardComponent} from "../components/card-presentation-double-image.compon
 import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
 
 @Component({
-  selector: 'app-home',
+  selector: 'trapotopia-home',
   standalone: true,
   template: `
     <!-- Landing page -->
@@ -20,10 +20,10 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
       </div>
 
       <div class="relative z-10 text-center px-4 max-w-4xl mx-auto -mt-24">
-        <h1 class="text-lg md:text-2xl lg:text-3xl font-bold text-white drop-shadow-lg font-orbitron">
+        <h1 class="text-lg md:text-2xl lg:text-3xl font-bold text-white font-montserrat drop-shadow-lg">
           Libérez votre potentiel en rejoignant <br/>
           <span
-            class="block mt-4 text-4xl md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-linear-to-r from-white to-gray-400">
+            class="block mt-4 text-4xl font-luckiest font-thin md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-linear-to-r from-white to-gray-400">
         Trapotopia
       </span>
         </h1>
@@ -42,7 +42,7 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
     <section class="py-20 px-4 bg-[#121212]">
       <div class="max-w-6xl mx-auto">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-orbitron">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
           Pourquoi nous ?
         </h2>
 
@@ -51,7 +51,7 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
           <!-- row/column -->
           <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12" appScrollReveal="fade-left">
 
-            <app-card-presentation-double-image
+            <trapotopia-card-presentation-double-image
               image1Url="/tete-de-mort-etat-dofus.png"
               [image1Height]=192
               [image1Width]=192
@@ -77,7 +77,7 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
           <!-- row/column -->
           <div class="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12" appScrollReveal="fade-right">
 
-            <app-card-presentation-double-image
+            <trapotopia-card-presentation-double-image
               image1Url="/logo-discord.png"
               [image1Height]=178
               [image1Width]=159
@@ -108,8 +108,8 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
     <section class="py-20 px-4 bg-[#121212]">
       <div class="max-w-6xl mx-auto">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-orbitron">
-          Ils nous font confiance
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
+          Ils nous détestent (et c'est bon signe)
         </h2>
 
       </div>
@@ -119,7 +119,7 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
     <section class="py-20 px-4 bg-[#121212]">
       <div class="max-w-6xl mx-auto">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-orbitron">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
           Nous rejoindre
         </h2>
 
@@ -130,19 +130,7 @@ import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
     NgOptimizedImage,
     CardComponent,
     ScrollRevealDirective
-  ],
-  styles: [`
-    /* Police stylée utilisé pour la landing page */
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-    .font-orbitron {
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    h3 {
-      text-wrap: balance;
-    }
-  `]
+  ]
 })
 export default class Home {
 }

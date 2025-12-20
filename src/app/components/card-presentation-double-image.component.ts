@@ -2,7 +2,7 @@ import {Component, input} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 
 @Component({
-  selector: 'app-card-presentation-double-image',
+  selector: 'trapotopia-card-presentation-double-image',
   standalone: true,
   imports: [CommonModule, NgOptimizedImage],
   template: `
@@ -38,12 +38,12 @@ import {CommonModule, NgOptimizedImage} from '@angular/common';
   `,
 })
 export class CardComponent {
-  public image1Url = input.required<string>();
-  public image2Url = input.required<string>();
-  public image1Alt = input.required<string>();
-  public image2Alt = input.required<string>();
-  public image1Width = input.required<number>();
-  public image1Height = input.required<number>();
-  public image2Width = input.required<number>();
-  public image2Height = input.required<number>();
+  public readonly image1Url = input.required<string>();
+  public readonly image2Url = input.required<string>();
+  public readonly image1Alt = input.required<string>();
+  public readonly image2Alt = input.required<string>();
+  public readonly image1Width = input.required<number>();
+  public readonly image1Height = input.required<number>();
+  public readonly image2Width = input.required<number>();
+  public readonly image2Height = input.required<number>();
 }

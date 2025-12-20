@@ -1,4 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 @import 'tailwindcss';
+
+@theme {
+  --font-luckiest: "Luckiest Guy", cursive;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-open-sans: "Open Sans", sans-serif;
+
+  --font-weight-montserrat-thin: 100;
+  --font-weight-montserrat-black: 900;
+}
+
+html, body {
+  font-family: var(--font-open-sans), sans-serif;
+  overflow-x: hidden; /* Bloque radicalement le scroll horizontal sur tout le site */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 /* Animation On Scroll */
 .reveal-init {
@@ -16,10 +36,7 @@
   transform: translate(0, 0) !important;
 }
 
-/* Bloque radicalement le scroll horizontal sur tout le site */
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+/* En attendant d'avoir la classe dans Tailwind */
+.text-wrap-balance {
+  text-wrap: balance;
 }
