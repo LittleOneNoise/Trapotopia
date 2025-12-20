@@ -160,5 +160,5 @@ import {CardReviewComponent} from "../components/card-review.component";
     CardReviewComponent
   ]
 })
-export default class Home {
+export default class HomePage {
 }

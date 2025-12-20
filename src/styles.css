@@ -4,12 +4,26 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Polices */
   --font-luckiest: "Luckiest Guy", cursive;
   --font-montserrat: "Montserrat", sans-serif;
   --font-open-sans: "Open Sans", sans-serif;
 
   --font-weight-montserrat-thin: 100;
   --font-weight-montserrat-black: 900;
+
+  /* Classe finale pour levitation */
+  --animate-float: float 1.5s ease-in-out infinite;
+}
+
+/* Specs base animation levitation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 html, body {
