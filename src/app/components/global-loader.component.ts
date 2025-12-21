@@ -42,7 +42,7 @@ export class GlobalLoaderComponent implements OnDestroy {
   private dotLottie: DotLottie | null = null;
   // Variables pour la logique anti-flickering
   private loadingStartTime = 0;
-  private readonly MIN_DISPLAY_TIME = 300;
+  private readonly MIN_DISPLAY_TIME = 100;
 
   constructor() {
     effect(() => {

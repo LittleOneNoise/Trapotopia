@@ -42,6 +42,7 @@ html, body {
 }
 
 .fade-up { transform: translateY(100px); }
+.fade-down { transform: translateY(-100px); }
 .fade-left { transform: translateX(-150px); }
 .fade-right { transform: translateX(150px); }
 

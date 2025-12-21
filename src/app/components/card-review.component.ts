@@ -6,7 +6,19 @@ import {CommonModule, NgOptimizedImage} from '@angular/common';
   standalone: true,
   imports: [CommonModule, NgOptimizedImage],
   template: `
-    <div class="bg-[#232323] p-8 rounded-2xl border border-white/5 shadow-2xl max-w-md w-full font-sans text-white">
+    <div class="relative bg-[#232323] p-8 rounded-2xl border border-white/5 shadow-2xl max-w-md w-full font-sans text-white">
+
+      <!-- Lumière directionnelle (haut-gauche) -->
+      <div
+        class="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(75%_60%_at_18%_12%,rgba(255,255,255,0.12),transparent_60%)] opacity-80"></div>
+
+      <!-- Relief interne -->
+      <div
+        class="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-22px_45px_rgba(0,0,0,0.7)]"></div>
+
+      <!-- Contour subtil -->
+      <div
+        class="pointer-events-none absolute -inset-px rounded-2xl bg-[linear-gradient(135deg,rgba(255,255,255,0.14),transparent_40%,rgba(255,255,255,0.08))] opacity-70"></div>
 
       <div class="flex justify-between items-center mb-6">
 
@@ -43,6 +55,10 @@ import {CommonModule, NgOptimizedImage} from '@angular/common';
           <ng-content></ng-content>
         </div>
       </div>
+
+      <!-- Ombre portée fixe (flottement) -->
+      <div
+        class="pointer-events-none absolute left-10 right-10 -bottom-6 h-12 rounded-full blur-2xl bg-black/75 opacity-45"></div>
 
     </div>
   `,

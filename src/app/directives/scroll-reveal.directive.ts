@@ -7,7 +7,7 @@ import {isPlatformBrowser} from '@angular/common';
 })
 export class ScrollRevealDirective implements OnInit {
   // Permet de choisir l'animation : fade-up, fade-left, etc.
-  public appScrollReveal = input<'fade-up' | 'fade-left' | 'fade-right'>('fade-up');
+  public appScrollReveal = input<'fade-up' | 'fade-down' | 'fade-left' | 'fade-right'>('fade-up');
   public delay = input<number>(0); // Optionnel : pour décaler l'animation
 
   private readonly el = inject(ElementRef);
