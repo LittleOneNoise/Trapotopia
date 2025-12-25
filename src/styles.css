@@ -1,6 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 @import 'tailwindcss';
 
 @theme {
@@ -9,29 +7,47 @@
   --font-montserrat: "Montserrat", sans-serif;
   --font-open-sans: "Open Sans", sans-serif;
 
-  --font-weight-montserrat-thin: 100;
-  --font-weight-montserrat-black: 900;
-
   /* Classe finale pour levitation */
   --animate-float: float 1.5s ease-in-out infinite;
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  };
+
+  --color-surface-900: oklch(12% 0 0);
+  --color-surface-800: oklch(17% 0 0);
+  --color-surface-700: oklch(23% 0 0);
+
+  --color-text-surface-900: oklch(80% 0 0);
+  --color-text-surface-800: oklch(76% 0 0);
+  --color-text-surface-700: oklch(60% 0 0);
+  --color-text-landing-image: oklch(85% 0 0);
+
+  --color-og-pink: oklch(68% 0.208 311.54);
+
+  --color-border-surface-900: oklch(25% 0 0);
+  --color-border-surface-800: oklch(27% 0 0);
+  --color-border-surface-700: oklch(29% 0 0);
 }
 
-/* Specs base animation levitation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+@utility font-heading {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
 }
 
 html, body {
   font-family: var(--font-open-sans), sans-serif;
   overflow-x: hidden; /* Bloque radicalement le scroll horizontal sur tout le site */
   width: 100%;
-  margin: 0;
-  padding: 0;
+  /* margin/padding inutiles car gérés par Tailwind Preflight */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
 }
 
 /* Animation On Scroll */
@@ -41,17 +57,23 @@ html, body {
   will-change: opacity, transform;
 }
 
-.fade-up { transform: translateY(100px); }
-.fade-down { transform: translateY(-100px); }
-.fade-left { transform: translateX(-150px); }
-.fade-right { transform: translateX(150px); }
+.fade-up {
+  transform: translateY(100px);
+}
+
+.fade-down {
+  transform: translateY(-100px);
+}
+
+.fade-left {
+  transform: translateX(-150px);
+}
+
+.fade-right {
+  transform: translateX(150px);
+}
 
 .is-revealed {
   opacity: 1 !important;
   transform: translate(0, 0) !important;
-}
-
-/* En attendant d'avoir la classe dans Tailwind */
-.text-wrap-balance {
-  text-wrap: balance;
 }

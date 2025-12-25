@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, ElementRef, signal, ViewChild, WritableSignal} from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
-import {NavigationEnd, Router, RouterLink, RouterLinkActive} from "@angular/router";
-import {filter} from 'rxjs/operators';
+import { AfterViewInit, Component, ElementRef, signal, ViewChild, WritableSignal } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 interface NavLink {
   path: string;
@@ -13,7 +13,7 @@ interface NavLink {
   standalone: true,
   imports: [CommonModule, NgOptimizedImage, RouterLink, RouterLinkActive],
   template: `
-    <nav class="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+    <nav class="fixed top-0 left-0 w-full z-50 text-text-surface-900 font-heading text-lg font-normal bg-surface-900/80 backdrop-blur-md border-b border-b-border-surface-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
 
@@ -27,7 +27,7 @@ interface NavLink {
             <div #navContainer class="relative ml-10 flex items-center space-x-1" (mouseleave)="resetToActive()">
 
               <div
-                class="absolute bottom-0 h-0.5 bg-[#C56CF6] transition-all duration-300 ease-out pointer-events-none"
+                class="absolute bottom-0 h-0.5 bg-og-pink transition-all duration-300 ease-out pointer-events-none"
                 [style.left.px]="indicatorLeft"
                 [style.width.px]="indicatorWidth"
                 [style.opacity]="indicatorWidth ? 1 : 0">
@@ -35,11 +35,28 @@ interface NavLink {
 
               @for (navLink of this.navLinkList; track navLink.label) {
                 <a [routerLink]="navLink.path"
-                   routerLinkActive="active-link text-[#C56CF6]"
+                   routerLinkActive="active-link text-og-pink"
                    [routerLinkActiveOptions]="{exact: true}"
                    (mouseenter)="moveIndicator($event.target)"
-                   class="hover:text-[#C56CF6] px-3 py-6 text-sm font-medium transition-colors cursor-pointer relative z-10">
+                   class="hover:text-og-pink px-3 py-6 transition-colors cursor-pointer relative z-10">
                   {{ navLink.label }}
+                </a>
+              }
+
+              @if (environmentMode === 'development') {
+                <a routerLink="/__analog/routes"
+                   routerLinkActive="active-link text-og-pink"
+                   [routerLinkActiveOptions]="{exact: true}"
+                   (mouseenter)="moveIndicator($event.target)"
+                   class="text-[oklch(0.69_0.12_70.5)] hover:text-og-pink px-3 py-6 transition-colors cursor-pointer relative z-10">
+                  Debug routes
+                </a>
+                <a routerLink="/sandbox"
+                   routerLinkActive="active-link text-og-pink"
+                   [routerLinkActiveOptions]="{exact: true}"
+                   (mouseenter)="moveIndicator($event.target)"
+                   class="text-[oklch(0.69_0.12_70.5)] hover:text-og-pink px-3 py-6 transition-colors cursor-pointer relative z-10">
+                  Sandbox
                 </a>
               }
 
@@ -92,8 +109,10 @@ export class HeaderComponent implements AfterViewInit {
     { path: '/events', label: 'Évènements' },
     { path: '/tools', label: 'Outils' },
     { path: '/stuffs', label: 'Stuffs' },
-    { path: '/influencers', label: 'Influenceurs' },
-    ]
+    { path: '/influencers', label: 'Nos influenceurs' },
+  ];
+
+  public readonly environmentMode: string = import.meta.env.MODE;
 
   constructor(private router: Router) {
     // Écoute les changements de route pour mettre à jour la ligne active
