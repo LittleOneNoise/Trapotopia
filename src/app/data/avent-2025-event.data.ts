@@ -2,6 +2,7 @@ export interface AventEventChallenge {
   day: number;
   title: string;
   rulesList?: string[];
+  imagesLinks?: string[];
   bonusInfos?: string[];
   startDate: string; // Respecter format ISO 8601 : YYYY-MM-DDTHH:mm:ssZ
   endDate: string; // Respecter format ISO 8601 : YYYY-MM-DDTHH:mm:ssZ
@@ -95,7 +96,12 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     day: 5,
     title: 'Need a DOC-tor',
     rulesList: [
-      'Celui qui dropera la ressource la plus chère',
+      'Dropper la ressource la plus cher possible selon le barème suivant :',
+      'xx points pour une ressource valant plus que 5 millions de kamas.',
+      'x points pour une ressource valant entre 1 million et 4.999.999 kamas.',
+      'x points pour une ressource valant entre 500.000 et 999.999 kamas.',
+      'x points pour une ressource valant entre 100.000 et 499.999 kamas.',
+      '1 points pour toute participation',
       'Tous les équipements sont autorisés, or ceux déjà interdits dans l’événement. Aucun consommable n’est accepté.',
       'L’équipe qui obtiendra la ressource la plus rare remportera l’épreuve.',
       'Vous pouvez tenter d’obtenir un drop par nimporte quel moyen sauf interdictions de base évidemment.',
@@ -103,6 +109,9 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
       'Les duos comptant un personnage de niveau inférieur à 200 sont autorisés à utiliser un seul compagnon.',
       "Il faudra envoyer le screen de l'écran de fin de combat avec la visualisation du nom de la ressource et du prix moyen, avec un autre screen qui montre le prix HDV",
       "Bien évidemment aucune manipulation d'un prix d'une ressource n'est acceptée."
+    ],
+    bonusInfos: [
+      "Comme la PLUPART DES duos ont pu évoqué le fait de farm des anomalies, je tiens à préciser que l'élixir uchronique est un consommable et est donc interdit"
     ],
     startDate: '2025-12-05T00:00:00Z',
     endDate: '2025-12-09T23:59:59Z'
@@ -113,7 +122,7 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     rulesList: [
       'Réaliser le Donjon Korriandre de façon suivante :',
       'Chaque monstre (de la salle boss) devra dans un premier temps être frappé au cac avec une flamiche.',
-      'Une fois frappé, ce même joueur peut continuer à le taper MAIS à 4 po minimum de lui, en ligne.',
+      'Une fois frappé, ce même joueur peut continuer à le taper MAIS à 4 po minimum de lui.',
       'Les deux joueurs de chaque équipe doivent respecter les deux règles ci-dessus, et ce chaque tour.',
       'Les joueurs inférieurs au lvl 200 pourront utiliser un des deux compagnons habituels. Le compagnon pourra seulement taper une fois à distance.',
       "Le donjon réalisé de sorte, valide l'épreuve."
@@ -162,6 +171,9 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
       'Le but : faire le plus de donjons unique de frigost en moins de 2 heures (du RM au Comte sans faire dazak et proto mais Grolloum compte)',
       'Tout est autorisé sauf les équipements et consommables interdits de base'
     ],
+    bonusInfos: [
+      "Pour que vos donjons soient pris en compte, vous devez absolument les réaliser dans l'ordre suivant : Royalmouth, Mansot Royal, Ben le Ripate, Obsidiantre, Tengu Givrefoux, Korriandre, Kolosso, Glourscéleste, Grolloum, Nileza, Sylargh, Klime, Missiz Frizz, Comte Harebourg. Tout donjon effectué hors de cet ordre ne sera pas validé pour l'épreuve."
+    ],
     startDate: '2025-12-10T00:00:00Z',
     endDate: '2025-12-22T23:59:59Z'
   },
@@ -171,8 +183,11 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     rulesList: [
       'Prévenir de votre participation imminente à un organisateur afin de récupérer votre lot de popcorns auprès de lui.',
       "Le but est d'effectuer le plus d'échanges possibles durant 30 minutes. (inconnus, guildeux, amis... -> libre à vous d'aider, ou non, les équipes adverses ! 😈) Le chronomètre sera géré par un organisateur.",
-      'Les échanges contre des kamas d’un montant supérieur à 500.000, rapportent des points supplémentaires.',
+      "Si vous ramenez au moins un (et seulement un autorisé) screen d'un échange contre 500.000 kamas minimum, cela rapportera un point supplémentaire.",
       "Veuillez envoyer à @Unesemaine ou autre organisateur, le plus de screens possible (validés au préalable par l'acheteur). -> Il y aura un top 3 ainsi qu'une mention spéciale à celui qui aura récolté le plus de kamas."
+    ],
+    bonusInfos: [
+      "Il faut en échanger/donner/vendre un maximum a des personnes différentes à chaque fois. Deux screens (ou plus) d'un échange avec le même joueur ne comptera que pour un."
     ],
     startDate: '2025-12-11T00:00:00Z',
     endDate: '2025-12-22T23:59:00Z'
@@ -250,6 +265,9 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     rulesList: [
       'Trouve la map précise depuis une image'
     ],
+    imagesLinks: [
+      '/avent-2025/jour-18-map.png',
+    ],
     startDate: '2025-12-18T00:00:00Z',
     endDate: '2025-12-22T23:59:00Z'
   },
@@ -258,6 +276,9 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     title: 'Trouve le mob',
     rulesList: [
       'Trouve le mob depuis une image'
+    ],
+    imagesLinks: [
+      '/avent-2025/jour-19-mob.png',
     ],
     startDate: '2025-12-19T00:00:00Z',
     endDate: '2025-12-22T23:59:00Z'
@@ -284,12 +305,15 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
       'Tous les coups sont permis : voler, déplacer, ramasser les ressources des autres duos est autorisé.',
       'Les créations peuvent être sabotées à tout moment.'
     ],
+    bonusInfos: [
+      "Il peut y avoir des obstacles sur la map mais pas à l'intérieur de votre œuvre"
+    ],
     startDate: '2025-12-21T00:00:00Z',
     endDate: '2025-12-22T23:59:00Z'
   },
   {
     day: 22,
-    title: 'Tournoi PvP (Finale + possibilité de doubler la mise !)',
+    title: 'Tournoi PvP (Finale + possibilité de doubler la mise)',
     rulesList: [
       '2v2 map aggro, les gagnants pourront tenter de battre le duo des organisateurs pour doubler leurs récompenses'
     ],
@@ -302,7 +326,7 @@ export const avent2025EventChallenges: AventEventChallenge[] = [
     rulesList: [
       "\"Aventuriers, l'histoire n'est pas qu'un récit, c'est une boussole. Pour trouver le portail qui vous permettra de lever les voiles sur votre passé, vous devez extraire les chiffres cachés dans les légendes de notre monde.\"",
       "I. La Clef de l'Horizon",
-      'Prenez le nombre de membres qui composent le Conseil d’Astrub.',
+      "Prenez le nombre de \"grandes\" Nations de l'Âge des Dofus",
       'Multipliez ce chiffre par le nombre de Dofus Primordiaux.',
       "À ce résultat, soustrayez le nombre de Cavaliers de l'Eliocalypse qui ont annoncé la fin des temps.",
       'Enfin, soustrayez 4.',
