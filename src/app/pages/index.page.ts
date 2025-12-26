@@ -1,8 +1,8 @@
-import {Component} from '@angular/core';
-import {NgOptimizedImage} from "@angular/common";
-import {CardComponent} from "../components/card-presentation-double-image.component";
-import {ScrollRevealDirective} from "../directives/scroll-reveal.directive";
-import {CardReviewComponent} from "../components/card-review.component";
+import { Component } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { CardComponent } from '../components/card-presentation-double-image.component';
+import { ScrollRevealDirective } from '../directives/scroll-reveal.directive';
+import { CardReviewComponent } from '../components/card-review.component';
 
 @Component({
   selector: 'trapotopia-home',
@@ -15,23 +15,23 @@ import {CardReviewComponent} from "../components/card-review.component";
           ngSrc="/landing-page-trapotopia-vs-comte.png"
           alt="landing-page-trapotopia-vs-comte"
           fill
-          class="object-cover opacity-30"
+          class="object-cover opacity-25"
           priority/>
-        <div class="absolute inset-0 bg-linear-to-t from-[#121212] via-transparent to-black/40"></div>
+        <div class="absolute inset-0 bg-linear-to-t from-surface-800 via-transparent to-black/40"></div>
       </div>
 
-      <div class="relative z-10 text-center px-4 max-w-4xl mx-auto -mt-24">
-        <h1 class="text-lg md:text-2xl lg:text-3xl font-bold text-white font-montserrat drop-shadow-lg">
+      <div class="relative z-10 text-center px-4 max-w-4xl mx-auto -mt-24 text-text-landing-image">
+        <h1 class="text-lg md:text-2xl lg:text-3xl drop-shadow-lg">
           Libérez votre potentiel en rejoignant <br/>
           <span
-            class="block mt-4 text-4xl font-luckiest font-thin md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-linear-to-r from-white to-gray-400">
+            class="block mt-4 text-4xl font-luckiest font-thin md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-linear-to-r from-text-landing-image from-30% to-og-pink">
         Trapotopia
       </span>
         </h1>
       </div>
 
       <div class="absolute bottom-40 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <svg class="w-20 h-20 text-[#C56CF6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        <svg class="w-20 h-20 text-og-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24"
              xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 10l5 5 5-5"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 6l5 5 5-5"></path>
@@ -40,10 +40,10 @@ import {CardReviewComponent} from "../components/card-review.component";
     </section>
 
     <!-- Pourquoi nous ? -->
-    <section class="py-20 px-4 bg-[#121212]">
-      <div class="max-w-6xl mx-auto">
+    <section class="py-20 px-4">
+      <div class="max-w-6xl mx-auto text-text-surface-800">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
+        <h2 class="text-3xl md:text-4xl text-center mb-20">
           Pourquoi nous ?
         </h2>
 
@@ -63,14 +63,14 @@ import {CardReviewComponent} from "../components/card-review.component";
               image2Alt="dm-unesemaine-trap"/>
 
             <div class="w-full md:w-1/2 text-center md:text-left">
-              <h3 class="text-xl font-bold text-gray-100 mb-4">Trapper ou être Trappé : Telle est la question</h3>
-              <p class="text-gray-400 leading-relaxed">
+              <h3 class="text-xl mb-4">Trapper ou être Trappé : Telle est la question</h3>
+              <p class="leading-relaxed">
                 L'ennui ? On ne connaît pas. Chez nous, chaque connexion est une prise de risque.
-                Notre spécialité est de vous embarquer de force (mais avec <span class="text-[#C56CF6]">amour</span>)
+                Notre spécialité est de vous embarquer de force (mais avec <span class="text-og-pink">amour</span>)
                 dans des aventures que personne ne veut faire. C'est ça, <span
-                class="text-[#C56CF6]">l'esprit du Trap</span> :
+                class="text-og-pink">l'esprit du Trap</span> :
                 vous faire vivre le pire du jeu, mais avec la <span
-                class="text-[#C56CF6]">meilleure des ambiances</span>.
+                class="text-og-pink">meilleure des ambiances</span>.
               </p>
             </div>
           </div>
@@ -89,13 +89,13 @@ import {CardReviewComponent} from "../components/card-review.component";
               image2Alt="view-group-discord-bot"/>
 
             <div class="w-full md:w-1/2 text-center md:text-left">
-              <h3 class="text-xl font-bold text-gray-100 mb-4">Un Discord qui ne dort jamais et un Bot complice</h3>
-              <p class="text-gray-400 leading-relaxed">
-                Notre Discord est le cœur battant de nos embuscades. Il nous permet de <span class="text-[#C56CF6]">prolonger l'expérience</span>
+              <h3 class="text-xl mb-4">Un Discord qui ne dort jamais et un Bot complice</h3>
+              <p class="leading-relaxed">
+                Notre Discord est le cœur battant de nos embuscades. Il nous permet de <span class="text-og-pink">prolonger l'expérience</span>
                 même hors-jeu.
-                Notre fierté, c'est notre Bot maison. Il facilite le <span class="text-[#C56CF6]">recrutement</span> et
-                la <span class="text-[#C56CF6]">gestion de groupe</span>.
-                Grâce à lui, accompagner nos membres vers <span class="text-[#C56CF6]">l'excellence</span> n'a jamais
+                Notre fierté, c'est notre Bot maison. Il facilite le <span class="text-og-pink">recrutement</span> et
+                la <span class="text-og-pink">gestion de groupe</span>.
+                Grâce à lui, accompagner nos membres vers <span class="text-og-pink">l'excellence</span> n'a jamais
                 été aussi fluide.
               </p>
             </div>
@@ -106,10 +106,10 @@ import {CardReviewComponent} from "../components/card-review.component";
     </section>
 
     <!-- Ils nous détestent (et c'est bon signe) -->
-    <section class="py-20 px-4 bg-[#121212]">
-      <div class="max-w-6xl mx-auto">
+    <section class="py-20 px-4">
+      <div class="max-w-6xl mx-auto text-text-surface-800">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
+        <h2 class="text-3xl md:text-4xl text-center mb-20">
           Ils nous détestent (et c'est bon signe)
         </h2>
 
@@ -145,10 +145,10 @@ import {CardReviewComponent} from "../components/card-review.component";
     </section>
 
     <!-- Nous rejoindre -->
-    <section class="py-20 px-4 bg-[#121212]">
-      <div class="max-w-6xl mx-auto">
+    <section class="py-20 px-4">
+      <div class="max-w-6xl mx-auto text-text-surface-800">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-200 mb-20 font-montserrat">
+        <h2 class="text-3xl md:text-4xl text-center mb-20">
           Nous rejoindre
         </h2>
 
