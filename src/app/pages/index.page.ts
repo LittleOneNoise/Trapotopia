@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
-import { CardComponent } from '../components/card-presentation-double-image.component';
+import { CardComponent } from '../components/elements/card-presentation-double-image.component';
 import { ScrollRevealDirective } from '../directives/scroll-reveal.directive';
-import { CardReviewComponent } from '../components/card-review.component';
+import { CardReviewComponent } from '../components/elements/card-review.component';
 
 @Component({
   selector: 'trapotopia-home',

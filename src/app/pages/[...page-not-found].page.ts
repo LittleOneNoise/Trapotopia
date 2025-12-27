@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { injectResponse } from '@analogjs/router/tokens';
 import { RouteMeta } from '@analogjs/router';
-import { ButtonComponent } from '../components/button.component';
+import { ButtonComponent } from '../components/elements/button.component';
 
 export const routeMeta: RouteMeta = {
   title: 'Page Non Trouvée - Trapotopia',

@@ -1,6 +1,6 @@
-import {Component, computed, input} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {GuildEvent} from "../data/guild-events.data";
+import { Component, computed, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { GuildEvent } from '../../data/guild-events.data';
 
 enum Status {
   IN_PROGRESS = 'IN_PROGRESS',

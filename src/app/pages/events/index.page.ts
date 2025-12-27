@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CardPresentationEventComponent } from '../../components/card-presentation-event.component';
+import { CardPresentationEventComponent } from '../../components/elements/card-presentation-event.component';
 import { GuildEvent, guildEventsData } from '../../data/guild-events.data';
 
 @Component({
