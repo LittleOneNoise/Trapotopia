@@ -1,7 +1,8 @@
-import { Component, computed, input, inject } from '@angular/core';
+import { Component, computed, input, inject, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { avent2025EventChallenges, AventEventChallenge } from '../../data/avent-2025-event.data';
 
 // Interface pour tes données (à mettre dans un fichier à part idéalement)
 interface Epreuve {
@@ -33,10 +34,29 @@ interface Epreuve {
 
       <main class="w-2/3 bg-parchment p-8 rounded-xl relative shadow-lg text-dofus-text">
         @if (selectedEpreuve(); as ev) {
-          <h1 class="text-3xl font-serif text-dofus-title mb-6">{{ ev.titre }}</h1>
+          <h1 class="text-3xl font-serif text-dofus-title mb-6">{{ ev.title }}</h1>
 
           <div class="mb-4">
-            <p class="text-lg">{{ ev.description }}</p>
+            @for (rule of ev.rulesList; track rule) {
+            <p class="text-lg">{{ rule }}</p>
+            }
+          </div>
+
+          <div class="mb-4">
+            @for (imageLink of ev.imagesLinks; track imageLink) {
+              <img [src]="imageLink"  [alt]="imageLink"/>
+            }
+          </div>
+
+          <div class="mb-4">
+            @for (bonusInfo of ev.bonusInfos; track bonusInfo) {
+              <p class="text-sm italic">{{ bonusInfo }}</p>
+            }
+          </div>
+
+          <div class="mb-4">
+              <p class="text-sm">Debut: {{ ev.startDate | date: 'DD/MM/YYYY HH:MM:ss' }}</p>
+            <p class="text-sm">Debut: {{ ev.endDate | date: 'DD/MM/YYYY HH:MM:ss' }}</p>
           </div>
 
           <button (click)="shareEpreuve()" class="bg-dofus-green text-white px-4 py-2 rounded mt-8">
@@ -77,8 +97,8 @@ export default class EventPage {
   });
 
   // Trouve l'épreuve correspondant au jour sélectionné
-  selectedEpreuve = computed(() =>
-    this.epreuves.find(e => e.jour === this.currentDay())
+  selectedEpreuve: Signal<AventEventChallenge | undefined> = computed(() =>
+    avent2025EventChallenges.find(e => e.day === this.currentDay())
   );
 
   // Change l'URL sans recharger la page
