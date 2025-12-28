@@ -1,148 +1,102 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { DofusMapBoardComponent } from '../components/map-board/map-board.component';
-import { CellType, EntityType, MapData, MapEntity } from '../components/map-board/model/map-board.model';
-import { DofusLosDebugComponent } from '../components/map-board/debug/dofus-los-debug.component';
+import { Puzzle, PuzzleResult } from '../components/map-board/model/puzzle.model';
+import { getPuzzles } from '../components/map-board/repository/puzzle.repository';
+import { arrayShuffle } from '../components/map-board/utils/array.utils';
 
 @Component({
   standalone: true,
   imports: [
-    DofusMapBoardComponent,
-    DofusLosDebugComponent
+    DofusMapBoardComponent
   ],
   template: `
-    <trapotopia-dofus-los-debug/>
-    <div class="game-container">
-      <div class="ui-panel">
-        <h1>Arène de test</h1>
-        <p>Joueur: Case {{ playerCellId() }}</p>
-        <p>Cliquez sur le sol pour vous déplacer.</p>
+    <trapotopia-map-board [puzzle]="puzzle()"
+                          [showLineOfSight]="showLineOfSight()"
+                          [showWinningCells]="showWinningCells()"
+                          [showMovement]="showMovement()"
+                          [highlightCell]="highlightCell()"
+                          (puzzleCompleted)="onPuzzleCompleted($event)"/>
 
-        <label>
-          <input type="checkbox" [checked]="showLos()" (change)="toggleLos()">
-          Activer Ligne de Vue (Fog of War)
-        </label>
+    @if (puzzleResult(); as result) {
+      <div class="result-modal">
+        <h3>{{ result.success ? 'Victoire !' : 'Échec' }}</h3>
+        <button (click)="onNextPuzzle()">Niveau Suivant</button>
       </div>
-
-      <trapotopia-map-board
-        [mapData]="currentMap"
-        [entities]="entities()"
-        [viewPoint]="playerCellId()"
-        [showLineOfSight]="showLos()"
-        (cellClicked)="onMapClick($event)"
-      />
-    </div>
+    }
   `
   ,
   styles: [`
-    .game-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #1e293b; /* Dark Slate */
-      min-height: 100vh;
-      color: white;
-      font-family: sans-serif;
-    }
-
-    .ui-panel {
-      margin-bottom: 20px;
-      z-index: 100; /* Au dessus de la map */
-      text-align: center;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 8px;
-    }
-
-    label {
-      cursor: pointer;
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #93c5fd;
-    }
   `]
 })
 export default class SandboxPage {
-  // --- Données de la Carte (14x14 est un standard courant) ---
-  readonly MAP_WIDTH = 14;
-  readonly MAP_HEIGHT = 14;
 
-  // On ne change pas la structure de la map dans cet exemple, donc pas besoin de Signal pour mapData entier
-  currentMap: MapData = this.generateDemoMap();
+  // --- Initialisation des données ---
+  puzzleResult = signal<PuzzleResult | null>(null);
+  playing = signal<boolean>(true);
+  // pour les binder individuellement aux Inputs du composant enfant.
+  showLineOfSight = signal(false);
+  showWinningCells = signal(false);
 
-  // --- État du Jeu (Signals) ---
+  // --- Map Configuration State (remplace mapProps) ---
+  // Il est plus performant et propre en Angular de séparer les signaux
+  showMovement = signal(true);
+  highlightCell = signal<number | null>(null);
+  // On récupère les puzzles. Note : Idéalement, ceci devrait être dans un Service.
+  private puzzles: Puzzle[] = getPuzzles();
+  // --- State Signals (remplace les refs) ---
+  puzzle = signal<Puzzle>(this.puzzles[0]);
 
-  // Position du joueur (sert de ViewPoint pour la ligne de vue)
-  playerCellId = signal<number>(198); // Commence en bas à droite (environ)
-
-  // Liste des entités (Joueurs, Monstres, Obstacles)
-  entities: WritableSignal<MapEntity[]> = signal([
-    { cellId: 198, type: EntityType.Ally }, // Le Joueur (doit matcher playerCellId au début)
-    { cellId: 28, type: EntityType.Enemy },  // Un ennemi en haut
-    { cellId: 105, type: EntityType.Obstacle }, // Un tonneau au milieu
-  ]);
-
-  showLos = signal(true);
-
-  // --- Logique ---
-
-  onMapClick(targetCellId: number) {
-    console.log('Déplacement vers la case :', targetCellId);
-
-    // 1. Mise à jour de la position logique du joueur (ViewPoint)
-    this.playerCellId.set(targetCellId);
-
-    // 2. Mise à jour de l'entité visuelle
-    this.entities.update(currentList => {
-      // On crée une nouvelle liste en modifiant seulement l'allié
-      return currentList.map(ent =>
-        ent.type === EntityType.Ally
-          ? { ...ent, cellId: targetCellId }
-          : ent
-      );
-    });
+  constructor() {
+    // Initialisation : mélange et sélection du premier
+    arrayShuffle(this.puzzles);
+    this.puzzle.set(this.puzzles[0]);
   }
 
-  toggleLos() {
-    this.showLos.update(v => !v);
-  }
+  // --- Méthodes ---
 
-  // --- Génération de Map de Démo ---
-  private generateDemoMap(): MapData {
-    const totalCells = this.MAP_WIDTH * this.MAP_HEIGHT;
-    const cells: CellType[] = new Array(totalCells).fill(CellType.Floor);
-
-    // On ajoute un peu de décor
-    for (let i = 0; i < totalCells; i++) {
-      const x = i % this.MAP_WIDTH;
-      const y = Math.floor(i / this.MAP_WIDTH);
-
-      // Création de trous sur les bords (pour faire une forme d'arène non carrée)
-      if (x === 0 || x === this.MAP_WIDTH - 1 || y === 0 || y === this.MAP_HEIGHT - 1) {
-        // Un trou sur deux sur les bords
-        if ((x + y) % 3 === 0) cells[i] = CellType.Hole;
-      }
-
-      // Création d'un mur en forme de croix au centre
-      const centerX = Math.floor(this.MAP_WIDTH / 2);
-      const centerY = Math.floor(this.MAP_HEIGHT / 2);
-
-      if ((x === centerX && Math.abs(y - centerY) < 3) ||
-        (y === centerY && Math.abs(x - centerX) < 3)) {
-        cells[i] = CellType.Wall;
-      }
-
-      // On retire le mur pile au centre pour laisser une ligne de vue "trou de serrure"
-      if (x === centerX && y === centerY) {
-        cells[i] = CellType.Floor;
-      }
+  onPuzzleCompleted(r: PuzzleResult) {
+    if (!this.playing()) {
+      return;
     }
 
-    return {
-      id: 1,
-      width: this.MAP_WIDTH,
-      height: this.MAP_HEIGHT,
-      cells: cells
-    };
+    // Mise à jour de l'état
+    this.playing.set(false);
+    this.puzzleResult.set(r);
+
+    // Mise à jour de la configuration de la carte (révélation)
+    this.showLineOfSight.set(true);
+    this.showWinningCells.set(true);
+    this.showMovement.set(false);
+    this.highlightCell.set(r.cellId);
   }
+
+  onNextPuzzle() {
+    if (this.playing()) {
+      return;
+    }
+
+    // Reset de l'état du jeu
+    this.playing.set(true);
+    this.puzzleResult.set(null);
+
+    // Reset de la configuration de la carte
+    this.showLineOfSight.set(false);
+    this.showWinningCells.set(false);
+    this.showMovement.set(true);
+    this.highlightCell.set(null);
+
+    // Logique de sélection du prochain puzzle
+    const currentId = this.puzzle().id; // Supposant que Puzzle a un id
+    const puzzleIdx = this.puzzles.findIndex(p => p.id === currentId);
+
+    if (puzzleIdx === this.puzzles.length - 1) {
+      // Si c'était le dernier, on remélange et on repart du début
+      arrayShuffle(this.puzzles);
+      this.puzzle.set(this.puzzles[0]);
+    } else {
+      // Sinon on prend le suivant
+      this.puzzle.set(this.puzzles[puzzleIdx + 1]);
+    }
+  }
+
 }

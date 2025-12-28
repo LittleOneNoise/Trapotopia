@@ -1,0 +1,44 @@
+<div class="grid-wrapper" [style]="wrapperStyle()">
+  <div
+    #gridRef
+    class="grid"
+    [ngStyle]="gridCssStyle()"
+  >
+    @for (cell of puzzle().map.cells; track $index) {
+      <div
+        class="grid-cell"
+        [attr.data-cellid]="$index"
+        [ngStyle]="resolveCellPositionStyle($index)"
+        [ngClass]="getCellClasses($index)"
+        (mouseenter)="onCellOverEnter($event)"
+        (mouseleave)="onCellOverLeave($event)"
+        (click)="onCellClick($event)"
+      >
+        @if (isWall($index)) {
+          <div class="cell-wall-top"></div>
+          <div class="cell-wall-left"></div>
+          <div class="cell-wall-right"></div>
+        }
+
+        @if (isPathCell($index)) {
+          <div class="cell-move"></div>
+        }
+
+        @if (getEntityClass($index); as entityClass) {
+          <div [class]="entityClass"></div>
+        }
+
+        @if (hoveredCellId() === $index) {
+          <div class="cell-hovered"></div>
+        }
+
+        @if (isWinningCell($index)) {
+          <div class="cell-win"></div>
+        } @else if (isLosingCell($index)) {
+          <div class="cell-lose"></div>
+        }
+
+      </div>
+    }
+  </div>
+</div>

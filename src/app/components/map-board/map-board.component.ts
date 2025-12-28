@@ -1,324 +1,225 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CellType, EntityType, MapData, MapEntity, RenderedCell } from './model/map-board.model';
-import { GeometryUtils } from './utils/geometry.utils';
+import { MapEntityType, Puzzle, PuzzleResult } from './model/puzzle.model';
+import { MAP_HORIZONTAL_CELLS_COUNT, MAP_VERTICAL_CELLS_COUNT } from './utils/map.utils';
+import { findShortestPath, findWinningCells, resolveLineOfSight } from './utils/puzzle.utils';
+import { Point, pointRotateX, pointRotateZ } from './utils/geometry.utils';
+import { Cell } from './model/map.model';
 
 @Component({
   selector: 'trapotopia-map-board',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="grid-wrapper" [style.width.px]="gridDimensions().width" [style.height.px]="gridDimensions().height">
-
-      <div class="grid-container" [style]="gridTransformStyle()">
-
-        @for (cell of renderedCells(); track cell.id) {
-          <div
-            class="cell"
-            [class]="getCellClasses(cell)"
-            [style.grid-area]="cell.cssRow + ' / ' + cell.cssCol"
-            (mouseenter)="onCellHover(cell)"
-            (mouseleave)="onCellLeave()"
-            (click)="onCellClick(cell)"
-          >
-            @if (cell.type === CellType.Wall) {
-              <div class="wall-face wall-left"></div>
-              <div class="wall-face wall-top"></div>
-              <div class="wall-face wall-right"></div>
-            }
-
-            @if (getEntityAt(cell.id); as entity) {
-              <div [class]="getEntityClasses(entity)"></div>
-            }
-
-            <div class="cell-overlay"></div>
-          </div>
-        }
-
-      </div>
-    </div>
-  `,
-  styles: [`
-    /* Container principal qui coupe ce qui dépasse */
-    .grid-wrapper {
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #0f172a; /* Dark bg */
-    }
-
-    /* La grille transformée en 3D */
-    .grid-container {
-      display: grid;
-      gap: 0;
-      /* Centrage absolu pour éviter que la rotation ne sorte de l'écran */
-      position: absolute;
-      transform-style: preserve-3d;
-    }
-
-    .cell {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: filter 0.1s ease;
-    }
-
-    /* --- SOLS --- */
-    .cell-floor {
-      cursor: pointer;
-    }
-    .cell-floor.cell-even { background-color: #8b8561; }
-    .cell-floor.cell-odd { background-color: #958d69; }
-
-    /* Line of Sight : On assombrit les cases non visibles */
-    .cell-hidden {
-      filter: brightness(0.4) grayscale(0.5);
-    }
-
-    .cell-hovered {
-      filter: brightness(1.3) !important; /* Priorité sur le hidden */
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    /* --- MURS (3D FAKE) --- */
-    .cell-wall {
-      /* Le dessus du mur est un peu plus clair */
-      background-color: #6d664b;
-      z-index: 10; /* Le mur doit passer au dessus des sols "derrière" lui visuellement */
-    }
-
-    /* Faces latérales des murs pour l'effet de hauteur */
-    .wall-face {
-      position: absolute;
-      background-color: #58533a;
-      outline: 1px solid rgba(0,0,0,0.1); /* Légère bordure */
-      pointer-events: none;
-    }
-
-    /* Face supérieure (Top) */
-    .wall-top {
-      width: 100%;
-      height: 100%;
-      transform: translateZ(20px); /* Monter visuellement si on utilisait de la vraie 3D, ici décoratif */
-      opacity: 0; /* En vue iso pure, la face "top" est la case elle-même */
-    }
-
-    /* Face Gauche (Skew Y) */
-    .wall-left {
-      width: 50%;
-      height: 100%;
-      right: 0;
-      top: 50%;
-      background-color: #4a4530; /* Face ombrée */
-      transform-origin: top right;
-      transform: skewY(-45deg) scaleY(1.414); /* Magie mathématique pour lier les tuiles */
-      z-index: -1;
-    }
-
-    /* Face Droite (Skew X) */
-    .wall-right {
-      width: 100%;
-      height: 50%;
-      left: 50%;
-      bottom: 0;
-      background-color: #3b3726; /* Face très ombrée */
-      transform-origin: bottom left;
-      transform: skewX(-45deg) scaleX(1.414);
-      z-index: -1;
-    }
-
-    /* --- ENTITÉS --- */
-    .entity {
-      position: absolute;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      height: 80%;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      transform: rotateZ(45deg); /* Contre-rotation pour que l'entité paraisse droite face caméra */
-    }
-
-    .entity-ally { background-color: #3b82f6; border: 2px solid #93c5fd; }
-    .entity-enemy { background-color: #ef4444; border: 2px solid #fca5a5; }
-    .entity-obstacle { background-color: #475569; border-radius: 10%; } /* Caisse carrée */
-  `]
+  templateUrl: './map-board.component.html',
+  styleUrl: './map-board.component.css'
 })
 export class DofusMapBoardComponent {
-  // --- Inputs ---
-  mapData = input.required<MapData>();
-  entities = input<MapEntity[]>([]);
+  // --- Inputs (Props) ---
+  puzzle = input.required<Puzzle>();
+  showLineOfSight = input(false);
+  showWinningCells = input(false);
+  showMovement = input(false);
+  highlightCell = input<number | null>(null);
 
-  // Configuration
-  showLineOfSight = input(true); // Activer/Désactiver le brouillard
-  viewPoint = input<number | null>(null); // L'ID de la cellule qui "regarde" (ex: le joueur actif)
+  // --- Outputs (Emits) ---
+  cellClick = output<number>();
+  puzzleCompleted = output<PuzzleResult>();
 
-  // --- Outputs ---
-  cellClicked = output<number>();
-
-  // --- State interne ---
+  // --- State (Refs) ---
   hoveredCellId = signal<number | null>(null);
+  hoveredCellLineOfSight = signal<Set<number> | null>(null);
+  movementPath = signal<Set<number> | null>(null);
 
-  // --- Constantes graphiques ---
-  readonly CELL_SIZE = 48; // px (équivalent 3rem)
+  // --- ViewChild (Template Ref) ---
+  gridRef = viewChild<ElementRef<HTMLDivElement>>('gridRef');
+  // --- Constants ---
+  readonly movementPoints = 5;
+  readonly rows = MAP_HORIZONTAL_CELLS_COUNT + MAP_VERTICAL_CELLS_COUNT;
+  readonly cols = MAP_HORIZONTAL_CELLS_COUNT + MAP_VERTICAL_CELLS_COUNT - 1;
+  winningCells = computed(() => findWinningCells(this.movementPoints, this.puzzle()));
+  // Signal pour stocker les dimensions calculées après le rendu
+  private gridDimensions = signal<{ width: number, height: number, top: number, left: number } | null>(null);
 
-  // --- Computeds (Optimisation) ---
-
-  // 1. Pré-calcul des coordonnées CSS et Logiques pour chaque cellule
-  // Cela évite de refaire des maths dans le template à chaque frame
-  renderedCells = computed<RenderedCell[]>(() => {
-    const map = this.mapData();
-    return map.cells.map((type, id) => {
-      // Conversion ID -> Logique (X,Y)
-      const logicPos = GeometryUtils.indexToPoint(id, map.width);
-
-      // Conversion ID -> Visuel (Grid CSS Row/Col)
-      // Note: J'adapte la logique "Zigzag" du fichier VueJS fourni pour matcher l'image
-      const row = Math.round(id / (2 * map.width)) + (id % map.width) + 1;
-      const col = -Math.trunc(id / (2 * map.width)) + (id % map.width) + map.height;
-
-      return { id, type, x: logicPos.x, y: logicPos.y, cssRow: row, cssCol: col };
-    });
-  });
-
-  // 2. Calcul des obstacles (Murs + Obstacles dynamiques)
-  obstaclesSet = computed<Set<string>>(() => {
-    const obstacles = new Set<string>();
-    const map = this.mapData();
-    const entities = this.entities();
-
-    // Ajouter les murs statiques
-    map.cells.forEach((cell, idx) => {
-      if (cell === CellType.Wall || cell === CellType.Invisible) {
-        const p = GeometryUtils.indexToPoint(idx, map.width);
-        obstacles.add(`${p.x},${p.y}`);
-      }
-    });
-
-    // Ajouter les entités obstacles
-    entities.forEach(ent => {
-      if (ent.type === EntityType.Obstacle) {
-        const p = GeometryUtils.indexToPoint(ent.cellId, map.width);
-        obstacles.add(`${p.x},${p.y}`);
-      }
-    });
-
-    return obstacles;
-  });
-
-  // 3. Calcul de la Ligne de Vue (LoS)
-  // Se recalcule UNIQUEMENT si la souris bouge, ou si le point de vue change, ou si les obstacles changent.
-  visibleCellsSet = computed<Set<string> | null>(() => {
-    if (!this.showLineOfSight()) return null;
-
-    // Priorité : Si on survole une case sol, c'est la source.
-    // Sinon, on utilise le viewPoint (personnage actif).
-    const hoverId = this.hoveredCellId();
-    const fixedViewId = this.viewPoint();
-
-    let sourceId: number | null = null;
-
-    // Si on survole le sol, on calcule depuis la souris (mode tactique/preview de déplacement)
-    if (hoverId !== null && this.mapData().cells[hoverId] === CellType.Floor) {
-      sourceId = hoverId;
-    } else if (fixedViewId !== null) {
-      sourceId = fixedViewId;
-    }
-
-    if (sourceId === null) return null;
-
-    const sourcePoint = GeometryUtils.indexToPoint(sourceId, this.mapData().width);
-
-    return GeometryUtils.calculateVisibilitySet(
-      sourcePoint,
-      this.mapData().width,
-      this.mapData().height,
-      this.obstaclesSet()
-    );
-  });
-
-  // --- Méthodes CSS Dynamiques ---
-
-  gridDimensions = computed(() => {
-    const h = this.mapData().height;
-    const w = this.mapData().width;
-    // Estimation approximative de la bounding box isométrique
+  // --- Computed Logic ---
+  wrapperStyle = computed(() => {
+    const dims = this.gridDimensions();
+    if (!dims) return { width: '0px', height: '0px' };
     return {
-      width: (w + h) * (this.CELL_SIZE * 0.8),
-      height: (w + h) * (this.CELL_SIZE * 0.5)
+      width: `${dims.width}px`,
+      height: `${dims.height}px`,
+    };
+  });
+  gridCssStyle = computed(() => {
+    const xRotation = 1.0472; // 60deg
+    const zRotation = 0.785398; // 45deg
+    const dims = this.gridDimensions();
+
+    const baseStyle = {
+      'grid-template-rows': `repeat(${this.rows}, var(--cell-size))`,
+      'grid-template-columns': `repeat(${this.cols}, var(--cell-size))`,
+      transform: `rotateX(${xRotation}rad) rotateZ(-${zRotation}rad)`,
+    };
+
+    if (!dims) return baseStyle;
+
+    return {
+      ...baseStyle,
+      top: `${dims.top}px`,
+      left: `${dims.left}px`,
     };
   });
 
-  gridTransformStyle = computed(() => {
-    // Rotation isométrique standard : rotateX(60deg) rotateZ(-45deg)
-    // C'est ce qui "aplatit" la grille carrée pour en faire des losanges.
-    return `
-      transform: rotateX(60deg) rotateZ(-45deg);
-      grid-template-rows: repeat(${this.mapData().height * 2}, ${this.CELL_SIZE}px);
-      grid-template-columns: repeat(${this.mapData().width * 2}, ${this.CELL_SIZE}px);
-    `;
-  });
+  constructor() {
+    afterNextRender(() => {
+      this.calculateGridDimensions();
+    });
+  }
 
-  // --- Helpers de Template ---
+  // --- Methods ---
 
-  getCellClasses(cell: RenderedCell): string {
-    const classes = [];
+  resolveCellPosition(cellId: number) {
+    const row = Math.round(cellId / (2 * MAP_HORIZONTAL_CELLS_COUNT)) + cellId % MAP_HORIZONTAL_CELLS_COUNT + 1;
+    const col = -Math.trunc(cellId / (2 * MAP_HORIZONTAL_CELLS_COUNT)) + cellId % MAP_HORIZONTAL_CELLS_COUNT + MAP_VERTICAL_CELLS_COUNT;
+    return [row, col] as const;
+  }
 
-    // Type de base
-    if (cell.type === CellType.Floor) classes.push('cell-floor');
-    if (cell.type === CellType.Hole) classes.push('cell-hole');
-    if (cell.type === CellType.Wall) classes.push('cell-wall');
+  resolveCellPositionStyle(cellId: number) {
+    const [row, col] = this.resolveCellPosition(cellId);
+    return { 'grid-area': `${row} / ${col}` };
+  }
 
-    // Pattern damier (Pair/Impair) pour esthétique Dofus
-    if ((cell.x + cell.y) % 2 === 0) classes.push('cell-even');
-    else classes.push('cell-odd');
+  getCellClasses(cellId: number): string[] {
+    const classes: string[] = [];
+    const puzzle = this.puzzle();
+    const cell = puzzle.map.cells[cellId];
 
-    // Gestion de la visibilité (Fog of War)
-    const visibility = this.visibleCellsSet();
-    if (visibility) {
-      const key = `${cell.x},${cell.y}`;
-      // Si ce n'est PAS dans le set visible, on assombrit
-      if (!visibility.has(key)) {
-        classes.push('cell-hidden');
+    if (cell === Cell.Floor) {
+      classes.push('cell-floor');
+      const [row, col] = this.resolveCellPosition(cellId);
+      classes.push(((row + col) % 2) === 0 ? 'cell-even' : 'cell-odd');
+
+      const los = this.hoveredCellLineOfSight();
+      if (this.showLineOfSight() && los !== null && !los.has(cellId)) {
+        classes.push('cell-fog');
       }
+    } else if (cell === Cell.Hole) {
+      classes.push('cell-hole');
+    } else if (cell === Cell.Wall) {
+      classes.push('cell-wall');
     }
 
-    // Highlight du curseur
-    if (this.hoveredCellId() === cell.id) {
-      classes.push('cell-hovered');
+    return classes;
+  }
+
+  isWall(cellId: number): boolean {
+    return this.puzzle().map.cells[cellId] === Cell.Wall;
+  }
+
+  // --- Template Helpers (C'est ce qui manquait !) ---
+
+  isPathCell(cellId: number): boolean {
+    return this.showMovement() && (this.movementPath()?.has(cellId) ?? false);
+  }
+
+  getEntityClass(cellId: number): string | null {
+    const entity = this.puzzle().entities.find(e => e.cellId === cellId);
+    if (!entity) return null;
+
+    // Retourne directement la classe CSS attendue
+    return entity.type === MapEntityType.Ally ? 'cell-ally' : 'cell-enemy';
+  }
+
+  isWinningCell(cellId: number): boolean {
+    return this.showWinningCells() && this.winningCells().includes(cellId);
+  }
+
+  isLosingCell(cellId: number): boolean {
+    // Si on affiche les résultats, que ce n'est PAS une case gagnante
+    // mais que c'est celle qui a été cliquée (highlightCell)
+    return this.showWinningCells() &&
+      !this.winningCells().includes(cellId) &&
+      this.highlightCell() === cellId;
+  }
+
+  onCellOverEnter(evt: MouseEvent) {
+    const cellId = this.getCellIdFromMouseEvent(evt);
+    const puzzle = this.puzzle();
+
+    if (puzzle.map.cells[cellId] === Cell.Floor) {
+      this.hoveredCellId.set(cellId);
+      this.hoveredCellLineOfSight.set(new Set(resolveLineOfSight(cellId, puzzle, true)));
     }
 
-    return classes.join(' ');
+    const ally = puzzle.entities.find(e => e.type === MapEntityType.Ally);
+    if (!ally) return;
+
+    const path = findShortestPath(ally.cellId, cellId, puzzle);
+    this.movementPath.set((path === null || path.length > this.movementPoints) ? null : new Set(path));
   }
 
-  getEntityAt(cellId: number): MapEntity | undefined {
-    return this.entities().find(e => e.cellId === cellId);
-  }
+  // --- Event Handlers ---
 
-  getEntityClasses(entity: MapEntity): string {
-    const base = 'entity';
-    if (entity.type === EntityType.Ally) return `${base} entity-ally`;
-    if (entity.type === EntityType.Enemy) return `${base} entity-enemy`;
-    return `${base} entity-obstacle`;
-  }
-
-  // --- Events ---
-
-  onCellHover(cell: RenderedCell) {
-    this.hoveredCellId.set(cell.id);
-  }
-
-  onCellLeave() {
+  onCellOverLeave(_: MouseEvent) {
     this.hoveredCellId.set(null);
+    this.hoveredCellLineOfSight.set(null);
+    this.movementPath.set(null);
   }
 
-  onCellClick(cell: RenderedCell) {
-    if (cell.type === CellType.Floor) {
-      this.cellClicked.emit(cell.id);
+  onCellClick(evt: MouseEvent) {
+    const targetCellId = this.getCellIdFromMouseEvent(evt);
+    const puzzle = this.puzzle();
+
+    if (puzzle.map.cells[targetCellId] !== Cell.Floor) {
+      return;
     }
+
+    this.cellClick.emit(targetCellId);
+
+    const ally = puzzle.entities.find(e => e.type === MapEntityType.Ally);
+    if (!ally) return;
+
+    const path = findShortestPath(ally.cellId, targetCellId, puzzle);
+    if (path === null || path.length > this.movementPoints) {
+      return;
+    }
+
+    this.puzzleCompleted.emit({
+      success: this.winningCells().includes(targetCellId),
+      cellId: targetCellId,
+    });
   }
 
-  protected readonly CellType = CellType;
+  private calculateGridDimensions() {
+    const el = this.gridRef()?.nativeElement;
+    if (!el || el.children.length === 0) return;
+
+    const xRotation = 1.0472;
+    const zRotation = 0.785398;
+
+    const originalWidth = el.scrollWidth;
+    const originalHeight = el.scrollHeight;
+
+    const topRightPoint: Point = [originalWidth / 2.0, originalHeight / 2.0];
+    const topLeftPoint: Point = [-originalWidth / 2.0, originalHeight / 2.0];
+
+    const rotatedTopRightPoint = pointRotateX(pointRotateZ(topRightPoint, zRotation), xRotation);
+    const rotatedTopLeftPoint = pointRotateX(pointRotateZ(topLeftPoint, zRotation), xRotation);
+
+    let top = rotatedTopRightPoint[1] - topRightPoint[1];
+    let left = topLeftPoint[0] - rotatedTopLeftPoint[0];
+
+    const cellRect = el.children[0].getBoundingClientRect();
+    top -= cellRect.height * (MAP_HORIZONTAL_CELLS_COUNT - 1) / 2.0;
+    left -= cellRect.width * (MAP_VERTICAL_CELLS_COUNT - 1) / 2.0;
+
+    const width = cellRect.width * (MAP_HORIZONTAL_CELLS_COUNT + 0.5);
+    const height = cellRect.height * (MAP_VERTICAL_CELLS_COUNT + 0.5);
+
+    this.gridDimensions.set({ width, height, top, left });
+  }
+
+  private getCellIdFromMouseEvent(evt: MouseEvent): number {
+    const target = evt.currentTarget as HTMLElement;
+    return parseInt(target.dataset['cellid']!, 10);
+  }
 }
