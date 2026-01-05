@@ -7,7 +7,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
   imports: [CommonModule, NgOptimizedImage],
   template: `
     <div
-      class="relative bg-surface-700 p-6 md:p-8 rounded-lg border border-border-surface-700 max-w-2xl w-full shadow-[0_28px_75px_-30px_rgba(0,0,0,0.95)]">
+      class="relative bg-surface-700 p-6 md:p-8 rounded-2xl border border-border-surface-700 max-w-2xl w-full shadow-[0_28px_75px_-30px_rgba(0,0,0,0.95)]">
 
       <!-- Contenu -->
       <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8 transform-[translateZ(24px)]">
