@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, inject, signal, ViewChild, WritableSignal } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, effect, ElementRef, inject, PLATFORM_ID, signal, viewChild, WritableSignal } from '@angular/core';
+import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -14,18 +14,20 @@ interface NavLink {
   imports: [CommonModule, NgOptimizedImage, RouterLink, RouterLinkActive],
   template: `
     <nav
-      class="fixed top-0 left-0 w-full z-50 text-text-surface-900 font-heading text-lg font-normal bg-surface-900/80 backdrop-blur-md border-b border-b-border-surface-900">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20">
+      class="fixed top-0 left-0 w-full z-50 text-text-surface-900 font-heading text-base font-medium bg-surface-900/80 backdrop-blur-md border-b border-b-border-surface-900">
+      <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center h-20">
 
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <img class="h-14 w-14 shrink-0" ngSrc="/logo_trapotopia_header.png" alt="logo_trapotopia_header"
-                 height="1000"
-                 width="1000" priority/>
+          <div class="flex items-center gap-3 shrink-0">
+            <a routerLink="/" class="block">
+              <img class="h-14 w-14 shrink-0" ngSrc="/logo_trapotopia_header.png" alt="logo_trapotopia_header"
+                   height="1000"
+                   width="1000" priority/>
+            </a>
           </div>
 
-          <div class="hidden md:block shrink-0">
-            <div #navContainer class="relative ml-10 flex items-center space-x-1" (mouseleave)="resetToActive()">
+          <div class="hidden md:flex flex-1 justify-center">
+            <div #navContainer class="relative flex items-center space-x-1" (mouseleave)="resetToActive()">
 
               <div
                 class="absolute bottom-0 h-0.5 bg-og-pink transition-all duration-300 ease-out pointer-events-none"
@@ -64,6 +66,9 @@ interface NavLink {
             </div>
           </div>
 
+          <!-- Élément invisible pour équilibrer le layout et garder les liens centrés -->
+          <div class="hidden md:block w-14 shrink-0"></div>
+
           <div class="flex md:hidden shrink-0 ml-4">
             <button (click)="toggleMenu()"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
@@ -95,15 +100,18 @@ interface NavLink {
     </nav>
   `,
 })
-export class HeaderComponent implements AfterViewInit {
+export class HeaderComponent {
   public isMobileMenuOpen: WritableSignal<boolean> = signal(false);
 
   // Variables pour la position et la taille de la barre
   public indicatorLeft = 0;
   public indicatorWidth = 0;
 
+  // Signal pour savoir si l'initialisation a été faite
+  private readonly initialized = signal(false);
+
   // Référence au conteneur des liens pour limiter la recherche du DOM
-  @ViewChild('navContainer') navContainer!: ElementRef<HTMLElement>;
+  public navContainer = viewChild<ElementRef<HTMLElement>>('navContainer');
 
   public navLinkList: NavLink[] = [
     { path: '/', label: 'Accueil' },
@@ -116,6 +124,7 @@ export class HeaderComponent implements AfterViewInit {
   public readonly environmentMode: string = import.meta.env.MODE;
 
   public readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
 
   constructor() {
     // Écoute les changements de route pour mettre à jour la ligne active
@@ -125,12 +134,31 @@ export class HeaderComponent implements AfterViewInit {
       // Petit timeout pour laisser le temps à routerLinkActive d'appliquer la classe
       setTimeout(() => this.resetToActive(), 50);
     });
+
+    // Effet qui se déclenche quand navContainer devient disponible (côté browser uniquement)
+    effect(() => {
+      const container = this.navContainer();
+      if (container && !this.initialized() && isPlatformBrowser(this.platformId)) {
+        // Le conteneur est prêt, on initialise avec retry
+        this.initializeIndicatorWithRetry();
+      }
+    });
   }
 
-  ngAfterViewInit() {
-    // Initialisation au chargement de la page
-    // Timeout nécessaire pour éviter l'erreur ExpressionChangedAfterItHasBeenCheckedError
-    setTimeout(() => this.resetToActive(), 0);
+  // Initialise l'indicateur avec plusieurs tentatives pour s'assurer que routerLinkActive a appliqué la classe
+  private initializeIndicatorWithRetry(attempts = 0, maxAttempts = 10) {
+    const container = this.navContainer();
+    if (!container) return;
+
+    const activeLink = container.nativeElement.querySelector('.active-link') as HTMLElement;
+
+    if (activeLink) {
+      this.setIndicator(activeLink);
+      this.initialized.set(true);
+    } else if (attempts < maxAttempts) {
+      // Réessayer après un court délai si aucun lien actif n'est trouvé
+      setTimeout(() => this.initializeIndicatorWithRetry(attempts + 1, maxAttempts), 50);
+    }
   }
 
   toggleMenu(): void {
@@ -147,10 +175,11 @@ export class HeaderComponent implements AfterViewInit {
 
   // Remet la ligne sur l'élément actif (appelé au mouseleave ou changement de route)
   resetToActive() {
-    if (!this.navContainer) return;
+    const container = this.navContainer();
+    if (!container) return;
 
     // On cherche l'élément qui a la classe .active-link à l'intérieur de notre nav
-    const activeLink = this.navContainer.nativeElement.querySelector('.active-link') as HTMLElement;
+    const activeLink = container.nativeElement.querySelector('.active-link') as HTMLElement;
 
     if (activeLink) {
       this.setIndicator(activeLink);
