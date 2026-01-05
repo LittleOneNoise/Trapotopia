@@ -15,7 +15,7 @@ import { CardReviewComponent } from '../components/elements/card-review.componen
           ngSrc="/landing-page-trapotopia-vs-comte.png"
           alt="landing-page-trapotopia-vs-comte"
           fill
-          class="object-cover opacity-25"
+          class="object-cover opacity-35"
           priority/>
         <div class="absolute inset-0 bg-linear-to-t from-surface-800 via-transparent to-black/40"></div>
       </div>
@@ -24,7 +24,7 @@ import { CardReviewComponent } from '../components/elements/card-review.componen
         <h1 class="text-lg md:text-2xl lg:text-3xl drop-shadow-lg">
           Libérez votre potentiel en rejoignant <br/>
           <span
-            class="block mt-4 text-4xl font-luckiest font-thin md:text-6xl lg:text-7xl text-transparent bg-clip-text bg-linear-to-r from-text-landing-image from-30% to-og-pink">
+            class="block mt-4 text-4xl font-luckiest font-thin md:text-6xl lg:text-7xl bg-clip-text">
         Trapotopia
       </span>
         </h1>
