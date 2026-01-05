@@ -19,7 +19,7 @@ interface NavLink {
         <div class="flex items-center h-20">
 
           <div class="flex items-center gap-3 shrink-0">
-            <a routerLink="/" class="block">
+            <a routerLink="/" class="block" (click)="onLogoClick()">
               <img class="h-14 w-14 shrink-0" ngSrc="/logo_trapotopia_header.png" alt="logo_trapotopia_header"
                    height="1000"
                    width="1000" priority/>
@@ -163,6 +163,18 @@ export class HeaderComponent {
 
   toggleMenu(): void {
     this.isMobileMenuOpen.update(v => !v);
+  }
+
+  // Met à jour la barre de soulignement quand on clique sur le logo
+  onLogoClick(): void {
+    const container = this.navContainer();
+    if (!container) return;
+
+    // Trouver le premier lien de navigation (Accueil)
+    const accueilLink = container.nativeElement.querySelector('a') as HTMLElement;
+    if (accueilLink) {
+      this.setIndicator(accueilLink);
+    }
   }
 
   // Déplace la ligne vers l'élément survolé
