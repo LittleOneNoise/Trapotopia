@@ -18,7 +18,7 @@ interface EventsByYear {
 
       @for (group of eventsByYear; track group.year) {
         <h1
-          class="flex justify-self-center py-2 px-4 mb-10 text-3xl md:text-4xl">
+          class="flex justify-self-center py-2 px-4 text-3xl md:text-4xl">
           {{ group.year }}
         </h1>
 
