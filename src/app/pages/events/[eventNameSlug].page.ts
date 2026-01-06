@@ -25,7 +25,7 @@ interface Epreuve {
             <button
               (click)="selectDay(epreuve.jour)"
               [class.border-gold]="currentDay() === epreuve.jour"
-              class="h-12 w-12 bg-dofus-cell border-2 border-dofus-border rounded flex items-center justify-center hover:bg-dofus-hover transition">
+              class="h-12 w-12 bg-dofus-cell border-2 border-dofus-border rounded flex items-center justify-center hover:bg-dofus-hover transition text-text-surface-800">
               {{ epreuve.jour }}
             </button>
           }
