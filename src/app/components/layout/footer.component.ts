@@ -22,11 +22,7 @@ import { CommonModule } from '@angular/common';
         <div class="flex flex-col md:flex-row justify-evenly items-center gap-2">
           <!-- Credits developpeurs -->
           <p>
-            Conçu et réalisé avec <span class="text-red-400 inline-block">❤</span> par
-            <span
-              class="text-text-surface-900">Little One</span>
-            et
-            <span class="text-text-surface-900">Unesemaine</span>
+            Conçu et réalisé avec <span class="text-red-400 inline-block">❤</span>
           </p>
           <!-- Infos dev -->
           <div class="flex items-center gap-3 bg-surface-800 rounded-full px-3 py-1 border border-border-surface-800">

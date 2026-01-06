@@ -26,7 +26,7 @@ export const routeMeta: RouteMeta = {
         <!-- 404 -->
         <div class="relative mb-6">
           <div
-            class="text-[10rem] md:text-[14rem] font-luckiest leading-none select-none flex items-center justify-center">
+            class="text-[8rem] md:text-[10rem] font-luckiest leading-none select-none flex items-center justify-center">
             <span class="bg-clip-text text-og-pink/80">4</span>
             <span class="text-text-surface-900 inline-block mx-2">0</span>
             <span class="bg-clip-text text-og-pink/80">4</span>
@@ -34,7 +34,7 @@ export const routeMeta: RouteMeta = {
         </div>
 
         <!-- Message principal -->
-        <h1 class="text-2xl md:text-4xl text-text-surface-800 mb-15">
+        <h1 class="text-xl md:text-2xl text-text-surface-800 mb-15">
           Cette page n'existe pas... ou a peut-être été mangée par un Bouftou !
         </h1>
 
