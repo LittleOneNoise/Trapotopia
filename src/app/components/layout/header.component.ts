@@ -116,9 +116,9 @@ export class HeaderComponent {
   public navLinkList: NavLink[] = [
     { path: '/', label: 'Accueil' },
     { path: '/events', label: 'Évènements' },
-    { path: '/tools', label: 'Outils' },
-    { path: '/stuffs', label: 'Stuffs' },
-    { path: '/influencers', label: 'Nos influenceurs' },
+    // { path: '/tools', label: 'Outils' },
+    // { path: '/stuffs', label: 'Stuffs' },
+    // { path: '/influencers', label: 'Nos influenceurs' },
   ];
 
   public readonly environmentMode: string = import.meta.env.MODE;
