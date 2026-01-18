@@ -33,12 +33,27 @@ config({ path: '.env.local' });
 export const env = {
   MODE: mode,
   DATABASE_URL: process.env['DATABASE_URL'] ?? '',
-  // Ajouter ici d'autres variables au besoin
+
+  // Discord OAuth2
+  DISCORD_CLIENT_ID: process.env['DISCORD_CLIENT_ID'] ?? '',
+  DISCORD_CLIENT_SECRET: process.env['DISCORD_CLIENT_SECRET'] ?? '',
+  DISCORD_REDIRECT_URI: process.env['DISCORD_REDIRECT_URI'] ?? '',
+  DISCORD_GUILD_ID: process.env['DISCORD_GUILD_ID'] ?? '',
+
+  // Session
+  SESSION_SECRET: process.env['SESSION_SECRET'] ?? '',
 } as const;
 
 // Validation au démarrage
 export function validateEnv(): void {
-  const required = ['DATABASE_URL'] as const;
+  const required = [
+    'DATABASE_URL',
+    'DISCORD_CLIENT_ID',
+    'DISCORD_CLIENT_SECRET',
+    'DISCORD_REDIRECT_URI',
+    'DISCORD_GUILD_ID',
+    'SESSION_SECRET',
+  ] as const;
   const missing = required.filter((key) => !env[key]);
 
   if (missing.length > 0) {

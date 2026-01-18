@@ -29,6 +29,10 @@
 
   --color-og-pink: oklch(68% 0.208 311.54);
 
+  /* Discord */
+  --color-discord: #5865F2;
+  --color-discord-hover: #4752C4;
+
   --color-border-surface-900: oklch(25% 0 0);
   --color-border-surface-800: oklch(27% 0 0);
   --color-border-surface-700: oklch(29% 0 0);

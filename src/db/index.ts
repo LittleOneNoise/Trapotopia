@@ -4,7 +4,7 @@ import { drizzle as drizzlePg, type NodePgDatabase } from 'drizzle-orm/node-post
 import { sql } from 'drizzle-orm';
 import { Pool } from 'pg';
 import * as schema from './schema';
-import { dbLogger } from '../logger/logger';
+import { log } from '../logger/logger';
 import { env } from '../config/env';
 
 // ============================================================
@@ -46,7 +46,7 @@ function createConnection(): DbConnection {
 
   if (isDev) {
     // --- MODE DEV : Connexion locale avec pool PostgreSQL ---
-    dbLogger.info('Mode LOCAL (pg pool)');
+    log.db.info('Mode LOCAL (pg pool)');
 
     const pool = new Pool({
       connectionString,
@@ -54,7 +54,7 @@ function createConnection(): DbConnection {
     });
 
     pool.on('error', (err) => {
-      dbLogger.error('Erreur inattendue sur le pool PostgreSQL:', err.message);
+      log.db.error('Erreur inattendue sur le pool PostgreSQL:', err.message);
     });
 
     return {
@@ -64,7 +64,7 @@ function createConnection(): DbConnection {
   }
 
   // --- MODE PROD : Connexion Serverless Neon ---
-  dbLogger.info('Mode NEON (serverless)');
+  log.db.info('Mode NEON (serverless)');
 
   const client: NeonQueryFunction<false, false> = neon(connectionString);
   return {
@@ -96,11 +96,11 @@ export async function checkDbConnection(): Promise<boolean> {
     const database = getDb();
     // Requête ultra-légère : SELECT 1
     await database.execute(sql`SELECT 1`);
-    dbLogger.success('Connexion fonctionnelle');
+    log.db.success('Connexion fonctionnelle');
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    dbLogger.error('Connexion échouée:', message);
+    log.db.error('Connexion échouée:', message);
     return false;
   }
 }
@@ -110,10 +110,10 @@ export async function checkDbConnection(): Promise<boolean> {
 // ============================================================
 export async function closeDbConnection(): Promise<void> {
   if (connection?.pool) {
-    dbLogger.info('Fermeture du pool de connexions...');
+    log.db.info('Fermeture du pool de connexions...');
     await connection.pool.end();
     connection = null;
-    dbLogger.success('Pool fermé');
+    log.db.success('Pool fermé');
   }
 }
 

@@ -9,16 +9,30 @@ export const scTrapotopia = pgSchema('sc_trapotopia');
 // ============================================================
 // USERS
 // ============================================================
-export const users = scTrapotopia.table('users', {
+export const discordUsers = scTrapotopia.table('discord_users', {
   id: serial('id').primaryKey(),
-  discordId: text('discord_id').unique().notNull(),
+  userId: text('user_id').unique().notNull(),
   username: text('username').notNull(),
   avatar: text('avatar'),
+  email: text('email'),
   role: text('role', { enum: ['MEMBER', 'EVENTS_STAFF', 'ADMIN'] }).default('MEMBER').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  modifiedAt: timestamp('modified_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  lastLoginAt: timestamp('last_login_at'),
 });
+export type DiscordUser = typeof discordUsers.$inferSelect;
+
+// ============================================================
+// SESSIONS
+// ============================================================
+export const sessions = scTrapotopia.table('sessions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => discordUsers.userId, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+export type Session = typeof sessions.$inferSelect;
 
 // ============================================================
 // EVENTS

@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 @Component({
   standalone: true,
   template: `
-    <p>Page des influenceurs à développer...</p>
+    <p>Page Admin à dev...</p>
   `
 })
-export default class InfluencersPage {
+export default class AdminPage {
 }
