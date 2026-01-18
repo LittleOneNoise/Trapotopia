@@ -83,7 +83,7 @@ export class AuthService {
    */
   login(): void {
     if (isPlatformBrowser(this.platformId)) {
-      window.location.href = '/api/v1/auth/login';
+      globalThis.location.href = '/api/v1/auth/login';
     }
   }
 
@@ -92,7 +92,7 @@ export class AuthService {
    */
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
-      window.location.href = '/api/v1/auth/logout';
+      globalThis.location.href = '/api/v1/auth/logout';
     }
   }
 
