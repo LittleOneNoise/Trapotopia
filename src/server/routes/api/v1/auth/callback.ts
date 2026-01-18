@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery, sendRedirect, setCookie } from 'h3';
+import { defineEventHandler, getQuery, sendRedirect, setCookie, getCookie, deleteCookie } from 'h3';
 import {
   exchangeCodeForToken,
   getDiscordUser,
@@ -12,6 +12,7 @@ import {
 } from '../../../../services/session.service';
 import { log } from '../../../../../logger/logger';
 import { env } from '../../../../../config/env';
+import { OAUTH_STATE_COOKIE } from './login';
 
 /**
  * GET /api/v1/auth/callback
@@ -20,18 +21,30 @@ import { env } from '../../../../../config/env';
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const code = query['code'] as string | undefined;
+  const state = query['state'] as string | undefined;
   const error = query['error'] as string | undefined;
   const errorDescription = query['error_description'] as string | undefined;
 
   // Gestion des erreurs Discord
   if (error) {
     log.auth.error(`Erreur OAuth2 Discord: ${error} - ${errorDescription}`);
+    deleteCookie(event, OAUTH_STATE_COOKIE);
     return sendRedirect(event, '/?error=discord_auth_failed', 302);
   }
 
   if (!code) {
     log.auth.error('Code d\'autorisation manquant');
+    deleteCookie(event, OAUTH_STATE_COOKIE);
     return sendRedirect(event, '/?error=missing_code', 302);
+  }
+
+  // Vérification CSRF : compare le state reçu avec celui stocké en cookie
+  const storedState = getCookie(event, OAUTH_STATE_COOKIE);
+  deleteCookie(event, OAUTH_STATE_COOKIE); // Supprime le cookie après lecture (usage unique)
+
+  if (!state || !storedState || state !== storedState) {
+    log.auth.error('State OAuth2 invalide - possible attaque CSRF');
+    return sendRedirect(event, '/?error=invalid_state', 302);
   }
 
   try {
