@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { getDb } from '../../db';
 import { discordUsers, sessions, type DiscordUser } from '../../db/schema';
 import { log } from '../../logger/logger';
-import type { DiscordUser as DiscordApiUser } from './discord.service';
+import type { DiscordUser as DiscordApiUser, DiscordGuildMember } from './discord.service';
 
 // ============================================================
 // Types
@@ -28,7 +28,7 @@ function generateSessionId(): string {
 /**
  * Crée ou met à jour un utilisateur dans la base de données
  */
-export async function upsertUser(discordUser: DiscordApiUser): Promise<DiscordUser> {
+export async function upsertUser(discordUser: DiscordApiUser, guildMember?: DiscordGuildMember): Promise<DiscordUser> {
   const db = getDb();
 
   log.auth.info(`Upsert utilisateur: ${discordUser.username} (${discordUser.id})`);
@@ -48,6 +48,8 @@ export async function upsertUser(discordUser: DiscordApiUser): Promise<DiscordUs
       .update(discordUsers)
       .set({
         username: discordUser.username,
+        globalName: discordUser.global_name ?? null,
+        nickname: guildMember?.nick ?? null,
         avatar: discordUser.avatar,
         email: discordUser.email ?? null,
         updatedAt: now,
@@ -66,6 +68,8 @@ export async function upsertUser(discordUser: DiscordApiUser): Promise<DiscordUs
     .values({
       userId: discordUser.id,
       username: discordUser.username,
+      globalName: discordUser.global_name ?? null,
+      nickname: guildMember?.nick ?? null,
       avatar: discordUser.avatar,
       email: discordUser.email ?? null,
       role: 'MEMBER',

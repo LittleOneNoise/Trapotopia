@@ -28,6 +28,8 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       discordId: user.userId, // ID Discord pour l'avatar
       username: user.username,
+      globalName: user.globalName, // Nom d'affichage Discord global
+      nickname: user.nickname, // Pseudo sur le serveur Discord
       avatar: user.avatar,
       role: user.role,
     },

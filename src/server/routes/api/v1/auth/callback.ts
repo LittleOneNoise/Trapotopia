@@ -66,8 +66,8 @@ export default defineEventHandler(async (event) => {
 
     log.auth.success(`Membre vérifié: ${discordUser.username} est sur le serveur`);
 
-    // 4. Créer ou mettre à jour l'utilisateur en base
-    const user = await upsertUser(discordUser);
+    // 4. Créer ou mettre à jour l'utilisateur en base (avec le nickname du serveur)
+    const user = await upsertUser(discordUser, guildMember);
 
     // 5. Créer une session
     const sessionId = await createSession(user.userId);

@@ -12,7 +12,9 @@ export const scTrapotopia = pgSchema('sc_trapotopia');
 export const discordUsers = scTrapotopia.table('discord_users', {
   id: serial('id').primaryKey(),
   userId: text('user_id').unique().notNull(),
-  username: text('username').notNull(),
+  username: text('username').notNull(), // @username unique Discord
+  globalName: text('global_name'), // Nom d'affichage Discord global
+  nickname: text('nickname'), // Pseudo affiché sur le serveur Discord
   avatar: text('avatar'),
   email: text('email'),
   role: text('role', { enum: ['MEMBER', 'EVENTS_STAFF', 'ADMIN'] }).default('MEMBER').notNull(),

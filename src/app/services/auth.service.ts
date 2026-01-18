@@ -12,6 +12,8 @@ export interface AuthUser {
   id: number;
   discordId: string;
   username: string;
+  globalName: string | null; // Nom d'affichage Discord global
+  nickname: string | null; // Pseudo sur le serveur Discord
   avatar: string | null;
   role: UserRole;
 }
@@ -111,5 +113,17 @@ export class AuthService {
 
     // Avatar personnalisé
     return `https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png?size=${size}`;
+  }
+
+  /**
+   * Retourne le meilleur nom à afficher
+   * Priorité : nickname (serveur) > globalName (Discord) > username
+   */
+  getDisplayName(): string | null {
+    const user = this._user();
+    if (!user) {
+      return null;
+    }
+    return user.nickname ?? user.globalName ?? user.username;
   }
 }
