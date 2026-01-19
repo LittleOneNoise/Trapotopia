@@ -39,6 +39,8 @@
   --color-border-surface-800: oklch(27% 0 0);
   --color-border-surface-700: oklch(29% 0 0);
   --color-border-surface-600: oklch(32% 0 0);
+  --color-border-surface-500: oklch(35% 0 0);
+  --color-border-surface-400: oklch(38% 0 0);
 }
 
 @utility font-heading {

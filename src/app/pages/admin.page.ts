@@ -84,16 +84,16 @@ interface UpdateUserResponse {
             <!-- Stats -->
             <div class="flex flex-wrap gap-2 sm:gap-4">
               <div class="bg-surface-700 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
-                <span class="text-text-surface-700/60 text-xs sm:text-sm">Total:</span>
+                <span class="text-text-surface-800/60 text-xs sm:text-sm">Total:</span>
                 <span class="ml-1 sm:ml-2 text-text-surface-700 font-semibold text-sm sm:text-base">{{ users().length }}</span>
               </div>
               <div class="bg-surface-700 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
-                <span class="text-text-surface-700/60 text-xs sm:text-sm">Actifs:</span>
-                <span class="ml-1 sm:ml-2 text-green-400 font-semibold text-sm sm:text-base">{{ activeUsersCount() }}</span>
+                <span class="text-text-surface-800/60 text-xs sm:text-sm">Actifs:</span>
+                <span class="ml-1 sm:ml-2 text-green-400/50 font-semibold text-sm sm:text-base">{{ activeUsersCount() }}</span>
               </div>
               <div class="bg-surface-700 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
-                <span class="text-text-surface-700/60 text-xs sm:text-sm">Inactifs:</span>
-                <span class="ml-1 sm:ml-2 text-red-400 font-semibold text-sm sm:text-base">{{ inactiveUsersCount() }}</span>
+                <span class="text-text-surface-800/60 text-xs sm:text-sm">Inactifs:</span>
+                <span class="ml-1 sm:ml-2 text-red-400/50 font-semibold text-sm sm:text-base">{{ inactiveUsersCount() }}</span>
               </div>
             </div>
 
@@ -116,35 +116,35 @@ interface UpdateUserResponse {
           </div>
 
           <!-- Vue Desktop : Tableau -->
-          <div class="hidden lg:block bg-surface-700 rounded-xl overflow-hidden">
+          <div class="hidden lg:block bg-surface-700 rounded-xl overflow-hidden border border-border-surface-700">
             <div class="overflow-x-auto">
               <table class="w-full">
-                <thead class="bg-surface-500">
+                <thead class="bg-surface-900">
                 <tr>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Utilisateur
                   </th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Rôle
                   </th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Statut
                   </th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Inscription
                   </th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Dernière MAJ
                   </th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-text-surface-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text-surface-900 uppercase tracking-wider">
                     Dernière connexion
                   </th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-border-surface-700">
                   @for (user of filteredUsers(); track user.id; let idx = $index) {
                     <tr class="transition-colors hover:bg-surface-600/50"
-                        [class]="idx % 2 === 0 ? 'bg-surface-700' : 'bg-surface-600/30'"
+                        [class]="idx % 2 === 0 ? 'bg-surface-700' : 'bg-surface-600'"
                         [class.opacity-50]="!user.isActive">
                       <!-- Avatar + Nom -->
                       <td class="px-6 py-4 whitespace-nowrap">
@@ -159,19 +159,19 @@ interface UpdateUserResponse {
                             </div>
                           }
                           <div>
-                            <div class="text-text-surface-700 font-medium">{{ getDisplayName(user) }}</div>
-                            <div class="text-text-surface-700/50 text-sm">&#64;{{ user.username }}</div>
+                            <div class="text-text-surface-800 font-medium">{{ getDisplayName(user) }}</div>
+                            <div class="text-text-surface-800/50 text-sm">&#64;{{ user.username }}</div>
                           </div>
                         </div>
                       </td>
 
                       <!-- Rôle (Select) -->
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
                         <select
                           [value]="user.role"
                           (change)="updateUserRole(user, $event)"
                           [disabled]="isCurrentUser(user) || updatingUsers().has(user.id)"
-                          class="bg-surface-600 border-0 text-text-surface-600 text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-og-pink disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          class="bg-surface-600 border border-border-surface-400 text-text-surface-700 text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-og-pink disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           [class]="getRoleSelectClass(user.role)">
                           <option value="MEMBER">Membre</option>
                           <option value="EVENTS_STAFF">Staff Events</option>
@@ -180,7 +180,7 @@ interface UpdateUserResponse {
                       </td>
 
                       <!-- Statut (Toggle) -->
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
                         <button
                           type="button"
                           role="switch"
@@ -197,23 +197,23 @@ interface UpdateUserResponse {
                       </td>
 
                       <!-- Date inscription -->
-                      <td class="px-6 py-4 whitespace-nowrap text-text-surface-700/60 text-sm">
+                      <td class="px-6 py-4 whitespace-nowrap text-center text-text-surface-700 text-sm">
                         {{ formatDate(user.createdAt) }}
                       </td>
 
                       <!-- Dernière MAJ -->
-                      <td class="px-6 py-4 whitespace-nowrap text-text-surface-700/60 text-sm">
+                      <td class="px-6 py-4 whitespace-nowrap text-center text-text-surface-700 text-sm">
                         {{ formatDate(user.updatedAt) }}
                       </td>
 
                       <!-- Dernière connexion -->
-                      <td class="px-6 py-4 whitespace-nowrap text-text-surface-700/60 text-sm">
+                      <td class="px-6 py-4 whitespace-nowrap text-center text-text-surface-700 text-sm">
                         {{ user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Jamais' }}
                       </td>
                     </tr>
                   } @empty {
                     <tr>
-                      <td colspan="6" class="px-6 py-12 text-center text-text-surface-700/50">
+                      <td colspan="6" class="px-6 py-12 text-center text-text-surface-800/50">
                         Aucun utilisateur trouvé
                       </td>
                     </tr>
@@ -241,8 +241,8 @@ interface UpdateUserResponse {
                       </div>
                     }
                     <div>
-                      <div class="text-text-surface-700 font-medium">{{ getDisplayName(user) }}</div>
-                      <div class="text-text-surface-700/50 text-sm">&#64;{{ user.username }}</div>
+                      <div class="text-text-surface-800 font-medium">{{ getDisplayName(user) }}</div>
+                      <div class="text-text-surface-800/50 text-sm">&#64;{{ user.username }}</div>
                     </div>
                   </div>
                   <!-- Toggle statut -->
@@ -263,12 +263,12 @@ interface UpdateUserResponse {
 
                 <!-- Rôle -->
                 <div class="flex items-center justify-between bg-surface-600/50 rounded-lg px-3 py-2">
-                  <span class="text-text-surface-700/60 text-sm">Rôle</span>
+                  <span class="text-text-surface-800/60 text-sm">Rôle</span>
                   <select
                     [value]="user.role"
                     (change)="updateUserRole(user, $event)"
                     [disabled]="isCurrentUser(user) || updatingUsers().has(user.id)"
-                    class="bg-surface-600 border-0 text-text-surface-600 text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-og-pink disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    class="bg-surface-600 border border-border-surface-400 text-text-surface-700 text-sm rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-og-pink disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     [class]="getRoleSelectClass(user.role)">
                     <option value="MEMBER">Membre</option>
                     <option value="EVENTS_STAFF">Staff Events</option>
@@ -279,21 +279,21 @@ interface UpdateUserResponse {
                 <!-- Dates -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
                   <div class="bg-surface-600/30 rounded-lg px-3 py-2">
-                    <div class="text-text-surface-700/50 text-xs">Inscription</div>
-                    <div class="text-text-surface-700/80">{{ formatDateShort(user.createdAt) }}</div>
+                    <div class="text-text-surface-800/50 text-xs">Inscription</div>
+                    <div class="text-text-surface-800/80">{{ formatDateShort(user.createdAt) }}</div>
                   </div>
                   <div class="bg-surface-600/30 rounded-lg px-3 py-2">
-                    <div class="text-text-surface-700/50 text-xs">Dernière MAJ</div>
-                    <div class="text-text-surface-700/80">{{ formatDateShort(user.updatedAt) }}</div>
+                    <div class="text-text-surface-800/50 text-xs">Dernière MAJ</div>
+                    <div class="text-text-surface-800/80">{{ formatDateShort(user.updatedAt) }}</div>
                   </div>
                   <div class="bg-surface-600/30 rounded-lg px-3 py-2">
-                    <div class="text-text-surface-700/50 text-xs">Dernière connexion</div>
-                    <div class="text-text-surface-700/80">{{ user.lastLoginAt ? formatDateShort(user.lastLoginAt) : 'Jamais' }}</div>
+                    <div class="text-text-surface-800/50 text-xs">Dernière connexion</div>
+                    <div class="text-text-surface-800/80">{{ user.lastLoginAt ? formatDateShort(user.lastLoginAt) : 'Jamais' }}</div>
                   </div>
                 </div>
               </div>
             } @empty {
-              <div class="bg-surface-700 rounded-xl p-8 text-center text-text-surface-700/50">
+              <div class="bg-surface-700 rounded-xl p-8 text-center text-text-surface-800/50">
                 Aucun utilisateur trouvé
               </div>
             }
