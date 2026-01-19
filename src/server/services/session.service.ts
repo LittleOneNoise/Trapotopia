@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { createHmac } from 'crypto';
+import { createHmac } from 'node:crypto';
 import { getDb } from '../../db';
 import { discordUsers, sessions, type DiscordUser } from '../../db/schema';
 import { log } from '../../logger/logger';
