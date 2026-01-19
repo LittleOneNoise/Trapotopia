@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/comm
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
+import { DiscordUserMenuComponent } from '../elements/discord-user-menu.component';
 
 interface NavLink {
   path: string;
@@ -12,7 +13,7 @@ interface NavLink {
 @Component({
   selector: 'trapotopia-header',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, RouterLink, RouterLinkActive],
+  imports: [CommonModule, NgOptimizedImage, RouterLink, RouterLinkActive, DiscordUserMenuComponent],
   template: `
     <nav
       class="fixed top-0 left-0 w-full z-50 text-text-surface-900 font-heading text-base font-medium bg-surface-900/80 backdrop-blur-md border-b border-b-border-surface-900">
@@ -47,6 +48,16 @@ interface NavLink {
                 </a>
               }
 
+              @if (authService.isAdmin()) {
+                <a routerLink="/admin"
+                   routerLinkActive="active-link text-og-pink"
+                   [routerLinkActiveOptions]="{exact: true}"
+                   (mouseenter)="moveIndicator($event.target)"
+                   class="hover:text-og-pink px-3 py-6 transition-colors cursor-pointer relative z-10">
+                  Administration
+                </a>
+              }
+
               @if (environmentMode === 'development') {
                 <a routerLink="/__analog/routes"
                    routerLinkActive="active-link text-og-pink"
@@ -69,71 +80,7 @@ interface NavLink {
 
           <!-- Bouton Connexion Discord / Menu utilisateur -->
           <div class="hidden md:flex items-center shrink-0">
-            @if (authService.loading()) {
-              <!-- Skeleton loader -->
-              <div class="w-32 h-10 bg-surface-800 rounded-lg animate-pulse"></div>
-            } @else if (authService.isAuthenticated()) {
-              <!-- Menu utilisateur connecté -->
-              <div class="relative" #userMenuContainer>
-                <button
-                  (click)="toggleUserMenu()"
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 transition-colors cursor-pointer">
-                  @if (authService.user()?.avatar) {
-                    <img
-                      [src]="getDiscordAvatarUrl()"
-                      alt="Avatar"
-                      class="w-8 h-8 rounded-full"
-                    />
-                  } @else {
-                    <div class="w-8 h-8 rounded-full bg-discord flex items-center justify-center">
-                      <span class="text-white text-sm font-bold">
-                        {{ authService.getDisplayName()?.charAt(0)?.toUpperCase() }}
-                      </span>
-                    </div>
-                  }
-                  <span class="text-text-surface-900 text-sm">{{ authService.getDisplayName() }}</span>
-                  <svg class="w-4 h-4 text-text-surface-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                  </svg>
-                </button>
-
-                @if (isUserMenuOpen()) {
-                  <div class="absolute right-0 mt-2 w-56 bg-surface-800 rounded-lg shadow-lg border border-border-surface-900 py-1 z-50">
-                    <div class="px-4 py-2 border-b border-border-surface-900">
-                      <div class="flex items-center gap-2">
-                        <p class="text-sm text-text-surface-900 font-medium truncate">{{ authService.getDisplayName() }}</p>
-                        <span class="text-xs text-gray-400">&#64;{{ authService.user()?.username }}</span>
-                      </div>
-                      <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded-full"
-                            [class]="getRoleBadgeClass()">
-                        {{ getRoleLabel() }}
-                      </span>
-                    </div>
-                    @if (authService.isAdmin()) {
-                      <a routerLink="/admin"
-                         class="block px-4 py-2 text-sm text-text-surface-900 hover:bg-surface-700 transition-colors">
-                        Administration
-                      </a>
-                    }
-                    <button
-                      (click)="authService.logout()"
-                      class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-surface-700 transition-colors cursor-pointer">
-                      Se déconnecter
-                    </button>
-                  </div>
-                }
-              </div>
-            } @else {
-              <!-- Bouton Connexion Discord -->
-              <button
-                (click)="authService.login()"
-                class="flex items-center gap-2 px-4 py-2 bg-discord hover:bg-discord-hover rounded-lg transition-colors font-medium text-white cursor-pointer">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                </svg>
-                Se connecter
-              </button>
-            }
+            <trapotopia-discord-user-menu />
           </div>
 
           <div class="flex md:hidden shrink-0 ml-4">
@@ -161,46 +108,18 @@ interface NavLink {
               </a>
             }
 
+            @if (authService.isAdmin()) {
+              <a routerLink="/admin"
+                 routerLinkActive="text-[#C56CF6] bg-gray-900"
+                 [routerLinkActiveOptions]="{exact: true}"
+                 class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-[#C56CF6] hover:bg-gray-900">
+                Administration
+              </a>
+            }
+
             <!-- Séparateur et bouton Discord mobile -->
             <div class="border-t border-white/10 my-2 pt-2">
-              @if (authService.loading()) {
-                <div class="px-3 py-2">
-                  <div class="w-full h-10 bg-surface-800 rounded-lg animate-pulse"></div>
-                </div>
-              } @else if (authService.isAuthenticated()) {
-                <div class="px-3 py-2">
-                  <div class="flex items-center gap-3 mb-2">
-                    <img [src]="getDiscordAvatarUrl()" alt="Avatar" class="w-10 h-10 rounded-full"/>
-                    <div>
-                      <p class="text-sm text-text-surface-900 font-medium">{{ authService.getDisplayName() }}</p>
-                      <p class="text-xs text-gray-400">&#64;{{ authService.user()?.username }}</p>
-                      <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded-full" [class]="getRoleBadgeClass()">
-                        {{ getRoleLabel() }}
-                      </span>
-                    </div>
-                  </div>
-                  @if (authService.isAdmin()) {
-                    <a routerLink="/admin"
-                       class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-og-pink hover:bg-gray-900">
-                      Administration
-                    </a>
-                  }
-                  <button
-                    (click)="authService.logout()"
-                    class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-400 hover:bg-gray-900 cursor-pointer">
-                    Se déconnecter
-                  </button>
-                </div>
-              } @else {
-                <button
-                  (click)="authService.login()"
-                  class="flex items-center justify-center gap-2 w-full mx-3 px-4 py-2 bg-discord hover:bg-discord-hover rounded-lg transition-colors font-medium text-white cursor-pointer">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                  </svg>
-                  Se connecter avec Discord
-                </button>
-              }
+              <trapotopia-discord-user-menu [mobile]="true" />
             </div>
 
           </div>
@@ -211,7 +130,6 @@ interface NavLink {
 })
 export class HeaderComponent {
   public isMobileMenuOpen: WritableSignal<boolean> = signal(false);
-  public isUserMenuOpen: WritableSignal<boolean> = signal(false);
 
   // Variables pour la position et la taille de la barre
   public indicatorLeft = 0;
@@ -222,8 +140,6 @@ export class HeaderComponent {
 
   // Référence au conteneur des liens pour limiter la recherche du DOM
   public navContainer = viewChild<ElementRef<HTMLElement>>('navContainer');
-  // Référence au conteneur du menu utilisateur pour détecter les clics extérieurs
-  public userMenuContainer = viewChild<ElementRef<HTMLElement>>('userMenuContainer');
 
   public navLinkList: NavLink[] = [
     { path: '/', label: 'Accueil' },
@@ -285,12 +201,6 @@ export class HeaderComponent {
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
 
-    // Fermer le menu utilisateur desktop si clic en dehors
-    const userMenuEl = this.userMenuContainer()?.nativeElement;
-    if (this.isUserMenuOpen() && userMenuEl && !userMenuEl.contains(target)) {
-      this.isUserMenuOpen.set(false);
-    }
-
     // Fermer le menu mobile si clic en dehors de la nav
     // On ne ferme pas si on clique sur le bouton hamburger (il a son propre toggle)
     if (this.isMobileMenuOpen()) {
@@ -343,40 +253,5 @@ export class HeaderComponent {
     // offsetLeft est la position relative au parent le plus proche en 'relative' (notre navContainer)
     this.indicatorLeft = element.offsetLeft;
     this.indicatorWidth = element.offsetWidth;
-  }
-
-  // ============================================================
-  // Menu Utilisateur Discord
-  // ============================================================
-  toggleUserMenu(): void {
-    this.isUserMenuOpen.update(v => !v);
-  }
-
-  getDiscordAvatarUrl(): string {
-    return this.authService.getAvatarUrl(64) ?? '';
-  }
-
-  getRoleBadgeClass(): string {
-    const role = this.authService.user()?.role;
-    switch (role) {
-      case 'ADMIN':
-        return 'bg-red-500/20 text-red-400';
-      case 'EVENTS_STAFF':
-        return 'bg-amber-500/20 text-amber-400';
-      default:
-        return 'bg-discord/20 text-discord';
-    }
-  }
-
-  getRoleLabel(): string {
-    const role = this.authService.user()?.role;
-    switch (role) {
-      case 'ADMIN':
-        return 'Admin';
-      case 'EVENTS_STAFF':
-        return 'Staff Events';
-      default:
-        return 'Membre';
-    }
   }
 }

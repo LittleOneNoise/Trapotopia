@@ -22,4 +22,5 @@ export const log = {
   discord: createLogger('DISCORD'),
   auth: createLogger('AUTH'),
   api: createLogger('API'),
+  admin: createLogger('ADMIN'),
 } as const;
