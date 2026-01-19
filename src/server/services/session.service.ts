@@ -1,7 +1,9 @@
 import { eq } from 'drizzle-orm';
+import { createHmac } from 'crypto';
 import { getDb } from '../../db';
 import { discordUsers, sessions, type DiscordUser } from '../../db/schema';
 import { log } from '../../logger/logger';
+import { env } from '../../config/env';
 import type { DiscordUser as DiscordApiUser, DiscordGuildMember } from './discord.service';
 
 // ============================================================
@@ -17,12 +19,25 @@ export interface SessionData {
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 jours
 
 /**
- * Génère un ID de session sécurisé
+ * Génère un ID de session sécurisé (envoyé au client dans le cookie)
  */
 function generateSessionId(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Hash le sessionId avec HMAC-SHA256 pour le stockage en BDD.
+ * Utilise SESSION_SECRET comme clé secrète.
+ *
+ * Sécurité : seul le hash est stocké en BDD, donc même si la BDD
+ * est compromise, les sessionIds ne peuvent pas être récupérés.
+ */
+function hashSessionId(sessionId: string): string {
+  return createHmac('sha256', env.SESSION_SECRET)
+    .update(sessionId)
+    .digest('hex');
 }
 
 /**
@@ -85,28 +100,32 @@ export async function upsertUser(discordUser: DiscordApiUser, guildMember?: Disc
 }
 
 /**
- * Crée une nouvelle session pour un utilisateur
+ * Crée une nouvelle session pour un utilisateur.
+ * Retourne le sessionId en clair (pour le cookie), mais stocke son hash en BDD.
  */
 export async function createSession(userId: string): Promise<string> {
   const db = getDb();
   const sessionId = generateSessionId();
+  const hashedSessionId = hashSessionId(sessionId);
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
   await db.insert(sessions).values({
-    id: sessionId,
+    id: hashedSessionId, // On stocke le hash, pas le sessionId en clair
     userId,
     expiresAt,
   });
 
   log.auth.info(`Session créée pour userId: ${userId}`);
-  return sessionId;
+  return sessionId; // On retourne le sessionId en clair pour le cookie
 }
 
 /**
- * Récupère une session et l'utilisateur associé
+ * Récupère une session et l'utilisateur associé.
+ * Le sessionId reçu (du cookie) est hashé avant comparaison avec la BDD.
  */
 export async function getSessionWithUser(sessionId: string): Promise<SessionData | null> {
   const db = getDb();
+  const hashedSessionId = hashSessionId(sessionId);
 
   const result = await db
     .select({
@@ -115,7 +134,7 @@ export async function getSessionWithUser(sessionId: string): Promise<SessionData
     })
     .from(sessions)
     .innerJoin(discordUsers, eq(sessions.userId, discordUsers.userId))
-    .where(eq(sessions.id, sessionId))
+    .where(eq(sessions.id, hashedSessionId))
     .limit(1);
 
   if (result.length === 0) {
@@ -135,12 +154,14 @@ export async function getSessionWithUser(sessionId: string): Promise<SessionData
 }
 
 /**
- * Supprime une session
+ * Supprime une session.
+ * Le sessionId reçu est hashé avant recherche en BDD.
  */
 export async function deleteSession(sessionId: string): Promise<void> {
   const db = getDb();
-  await db.delete(sessions).where(eq(sessions.id, sessionId));
-  log.auth.info(`Session supprimée: ${sessionId}`);
+  const hashedSessionId = hashSessionId(sessionId);
+  await db.delete(sessions).where(eq(sessions.id, hashedSessionId));
+  log.auth.info(`Session supprimée: ${hashedSessionId.substring(0, 8)}...`);
 }
 
 // ============================================================
