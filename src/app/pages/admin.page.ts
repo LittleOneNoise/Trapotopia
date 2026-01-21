@@ -319,10 +319,19 @@ export default class AdminPage implements OnInit {
   // Computed
   readonly filteredUsers = computed(() => {
     const allUsers = this.users();
-    if (this.showInactiveUsers()) {
-      return allUsers;
-    }
-    return allUsers.filter(user => user.isActive);
+    const filtered = this.showInactiveUsers()
+      ? allUsers
+      : allUsers.filter(user => user.isActive);
+
+    // Trier par date de dernière connexion (la plus récente en premier)
+    return filtered.slice().sort((a, b) => {
+      // Les utilisateurs sans connexion vont à la fin
+      if (!a.lastLoginAt && !b.lastLoginAt) return 0;
+      if (!a.lastLoginAt) return 1;
+      if (!b.lastLoginAt) return -1;
+
+      return new Date(b.lastLoginAt).getTime() - new Date(a.lastLoginAt).getTime();
+    });
   });
 
   readonly activeUsersCount = computed(() => this.users().filter(u => u.isActive).length);
