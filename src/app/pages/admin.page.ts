@@ -41,11 +41,6 @@ interface UpdateUserResponse {
   template: `
     <main class="min-h-screen bg-surface-800 pt-10 pb-12 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-text-surface-800">Administration</h1>
-          <p class="mt-2 text-text-surface-800/60">Gestion des utilisateurs enregistrés</p>
-        </div>
 
         @if (loading()) {
           <!-- Skeleton loader -->
